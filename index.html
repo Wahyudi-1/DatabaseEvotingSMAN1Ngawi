@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Data Pemilih - OSIS SMAN 1 Ngawi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PapaParse untuk membaca file CSV (Excel) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-lg w-full border border-slate-200">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-blue-900">Alat Upload Data Pemilih</h2>
+            <p class="text-slate-500 text-sm mt-1">Masukkan file CSV dari Excel untuk diunggah otomatis ke Firebase.</p>
+        </div>
+
+        <div class="bg-blue-50 p-4 rounded-xl mb-6 text-sm text-blue-800 border border-blue-100">
+            <strong>Pastikan format CSV Anda memiliki header:</strong><br>
+            <code class="font-bold">nisn, nama, role</code>
+        </div>
+
+        <input type="file" id="csv-file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all mb-6 cursor-pointer border border-slate-200 rounded-xl p-2 bg-slate-50">
+
+        <button id="btn-upload" class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            Mulai Upload ke Database
+        </button>
+
+        <!-- Area Status -->
+        <div id="status-area" class="mt-6 hidden">
+            <div class="flex justify-between text-sm font-bold text-slate-700 mb-2">
+                <span>Proses Upload:</span>
+                <span id="progress-text">0 / 0</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                <div id="progress-bar" class="bg-green-500 h-3 w-0 transition-all duration-300"></div>
+            </div>
+            <p id="log-message" class="text-xs text-center text-slate-500 mt-3 h-4"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // =====================================================================
+        // ⚠️ PENTING: GANTI DENGAN KUNCI FIREBASE (CONFIG) MILIK ANDA!
+        // =====================================================================
+        const firebaseConfig = {
+        apiKey: "AIzaSyCzeg9t7CjeoxNB9DaNK10NsHixk0LC9UA",
+        authDomain: "e-voting-6f923.firebaseapp.com",
+        projectId: "e-voting-6f923",
+        storageBucket: "e-voting-6f923.firebasestorage.app",
+        messagingSenderId: "626153070106",
+        appId: "1:626153070106:web:309766b2c60f3a01a9fba3",
+        measurementId: "G-ERXK45EJPE"
+        };
+        // =====================================================================
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'osis-sman1ngawi-app'; // Sesuai dengan folder di aplikasi utama
+
+        const btnUpload = document.getElementById('btn-upload');
+        const fileInput = document.getElementById('csv-file');
+        const statusArea = document.getElementById('status-area');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const logMessage = document.getElementById('log-message');
+
+        btnUpload.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Silakan pilih file CSV terlebih dahulu!");
+                return;
+            }
+
+            btnUpload.disabled = true;
+            fileInput.disabled = true;
+            statusArea.classList.remove('hidden');
+            logMessage.textContent = "Menghubungkan ke Firebase...";
+            logMessage.className = "text-xs text-center text-blue-500 mt-3 h-4";
+
+            try {
+                // Login anonim agar diizinkan menulis data oleh Firebase Rules
+                await signInAnonymously(auth);
+                logMessage.textContent = "Membaca file CSV...";
+
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: async function(results) {
+                        const data = results.data;
+                        const total = data.length;
+                        
+                        if (total === 0) {
+                            alert("File CSV kosong atau format salah.");
+                            resetUI();
+                            return;
+                        }
+
+                        // Validasi header
+                        const firstRow = data[0];
+                        if (!firstRow.hasOwnProperty('nisn') || !firstRow.hasOwnProperty('nama')) {
+                            alert("Format Header salah! Pastikan baris pertama berisi: nisn, nama, role");
+                            resetUI();
+                            return;
+                        }
+
+                        let successCount = 0;
+                        logMessage.textContent = "Memulai proses upload (Mohon jangan tutup jendela ini)...";
+
+                        // Proses upload satu per satu secara berurutan agar stabil
+                        for (let i = 0; i < total; i++) {
+                            const row = data[i];
+                            const nisn = row.nisn ? row.nisn.toString().trim() : "";
+                            const nama = row.nama ? row.nama.toString().trim().toUpperCase() : "";
+                            const role = row.role ? row.role.toString().trim() : "Siswa";
+
+                            if (nisn && nama) {
+                                try {
+                                    // Path database SAMA PERSIS dengan struktur aplikasi utama
+                                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
+                                    await setDoc(docRef, { name: nama, role: role });
+                                    successCount++;
+                                } catch (err) {
+                                    console.error(`Gagal upload NISN ${nisn}:`, err);
+                                }
+                            }
+
+                            // Update UI Loading Bar
+                            const percent = Math.round(((i + 1) / total) * 100);
+                            progressBar.style.width = `${percent}%`;
+                            progressText.textContent = `${i + 1} / ${total}`;
+                        }
+
+                        logMessage.textContent = "Selesai!";
+                        logMessage.className = "text-xs text-center font-bold text-green-600 mt-3 h-4";
+                        alert(`Upload Berhasil!\nTotal data diproses: ${total}\nBerhasil masuk: ${successCount}`);
+                        resetUI(true);
+                    },
+                    error: function(err) {
+                        alert("Gagal membaca file CSV: " + err.message);
+                        resetUI();
+                    }
+                });
+
+            } catch (error) {
+                console.error(error);
+                alert("Gagal terhubung ke Firebase. Pastikan Config Kunci Anda benar.");
+                resetUI();
+            }
+        });
+
+        function resetUI(success = false) {
+            btnUpload.disabled = false;
+            fileInput.disabled = false;
+            if (!success) statusArea.classList.add('hidden');
+            fileInput.value = '';
+        }
+    </script>
+</body>
+</html>
