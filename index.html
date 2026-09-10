@@ -10,101 +10,184 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-6 font-sans">
+<body class="bg-slate-100 min-h-screen flex flex-col items-center p-4 md:p-6 font-sans">
 
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl border border-slate-200 overflow-hidden flex flex-col md:flex-row">
+    <!-- Header Panel -->
+    <div class="w-full max-w-5xl flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-800">Panel Admin Pemilih</h1>
+            <p class="text-slate-500 text-sm">Sistem E-Voting OSIS SMAN 1 Ngawi</p>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-5xl border border-slate-200 overflow-hidden flex flex-col">
         
-        <!-- BAGIAN KIRI: UPLOAD MASSAL (CSV) -->
-        <div class="p-8 md:w-1/2 bg-white border-b md:border-b-0 md:border-r border-slate-100">
-            <div class="mb-6 flex items-center gap-3">
-                <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
-                    <i class="ph-fill ph-file-csv text-2xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-slate-800">Upload Massal</h2>
-                    <p class="text-slate-500 text-xs mt-1">Masukkan banyak data sekaligus via Excel/CSV.</p>
-                </div>
-            </div>
-
-            <div class="bg-blue-50 p-4 rounded-xl mb-6 text-xs text-blue-800 border border-blue-100">
-                <strong>Format Header CSV (Baris 1):</strong><br>
-                <code class="font-bold bg-blue-100 px-1 py-0.5 rounded">nisn, nama, role</code>
-            </div>
-
-            <input type="file" id="csv-file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all mb-6 cursor-pointer border border-slate-200 rounded-xl p-2 bg-slate-50">
-
-            <button id="btn-upload" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
-                <i class="ph-bold ph-upload-simple text-lg"></i>
-                Mulai Upload Massal
+        <!-- Tab Navigasi -->
+        <div class="flex border-b border-slate-200 bg-slate-50">
+            <button id="tab-input" class="flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2">
+                <i class="ph-bold ph-plus-circle text-lg"></i> Input Data
             </button>
+            <button id="tab-database" class="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2">
+                <i class="ph-bold ph-database text-lg"></i> Database Pemilih
+            </button>
+        </div>
 
-            <!-- Area Status Upload Massal -->
-            <div id="status-area" class="mt-6 hidden">
-                <div class="flex justify-between text-xs font-bold text-slate-700 mb-2">
-                    <span>Proses Upload:</span>
-                    <span id="progress-text">0 / 0</span>
+        <!-- ========================================== -->
+        <!-- VIEW 1: INPUT DATA (Massal & Manual) -->
+        <!-- ========================================== -->
+        <div id="view-input" class="flex flex-col md:flex-row w-full">
+            <!-- BAGIAN KIRI: UPLOAD MASSAL (CSV) -->
+            <div class="p-8 md:w-1/2 bg-white border-b md:border-b-0 md:border-r border-slate-100">
+                <div class="mb-6 flex items-center gap-3">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+                        <i class="ph-fill ph-file-csv text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Upload Massal</h2>
+                        <p class="text-slate-500 text-xs mt-1">Masukkan banyak data sekaligus via Excel/CSV.</p>
+                    </div>
                 </div>
-                <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
-                    <div id="progress-bar" class="bg-blue-500 h-2.5 w-0 transition-all duration-300"></div>
+
+                <div class="bg-blue-50 p-4 rounded-xl mb-6 text-xs text-blue-800 border border-blue-100">
+                    <strong>Format Header CSV (Baris 1):</strong><br>
+                    <code class="font-bold bg-blue-100 px-1 py-0.5 rounded">nisn, nama, role</code>
                 </div>
-                <p id="log-message" class="text-xs text-center text-slate-500 mt-3"></p>
+
+                <input type="file" id="csv-file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all mb-6 cursor-pointer border border-slate-200 rounded-xl p-2 bg-slate-50">
+
+                <button id="btn-upload" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+                    <i class="ph-bold ph-upload-simple text-lg"></i>
+                    Mulai Upload Massal
+                </button>
+
+                <!-- Area Status Upload Massal -->
+                <div id="status-area" class="mt-6 hidden">
+                    <div class="flex justify-between text-xs font-bold text-slate-700 mb-2">
+                        <span>Proses Upload:</span>
+                        <span id="progress-text">0 / 0</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                        <div id="progress-bar" class="bg-blue-500 h-2.5 w-0 transition-all duration-300"></div>
+                    </div>
+                    <p id="log-message" class="text-xs text-center text-slate-500 mt-3"></p>
+                </div>
+            </div>
+
+            <!-- BAGIAN KANAN: TAMBAH / EDIT MANUAL -->
+            <div class="p-8 md:w-1/2 bg-slate-50">
+                <div class="mb-6 flex items-center gap-3">
+                    <div class="p-3 bg-green-100 text-green-600 rounded-xl">
+                        <i class="ph-fill ph-user-plus text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Tambah / Edit Manual</h2>
+                        <p class="text-slate-500 text-xs mt-1">Gunakan untuk data susulan atau perbaikan nama.</p>
+                    </div>
+                </div>
+
+                <form id="form-manual" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">NISN / NIP (ID Pemilih)</label>
+                        <input type="text" id="manual-id" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-medium" placeholder="Contoh: 1234567890">
+                        <p class="text-[10px] text-slate-400 mt-1">*Jika NISN sudah ada, sistem otomatis mengubah datanya.</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="manual-name" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none uppercase font-medium" placeholder="Masukkan nama...">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Sebagai (Role)</label>
+                        <select id="manual-role" class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-medium">
+                            <option value="Siswa">Siswa</option>
+                            <option value="Guru">Guru / Staf</option>
+                            <option value="Panitia">Panitia (Akses Dasbor)</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-2 flex gap-2">
+                        <button type="submit" id="btn-manual-submit" class="flex-1 py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-md transition-all flex justify-center items-center gap-2">
+                            <i class="ph-bold ph-floppy-disk text-lg"></i>
+                            <span id="text-manual-submit">Simpan Data</span>
+                        </button>
+                        <!-- Tombol Batal Edit (Hanya muncul saat mode edit dari tabel) -->
+                        <button type="button" id="btn-cancel-edit" class="hidden py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+
+                <div id="manual-alert" class="mt-4 hidden p-3 rounded-lg text-xs font-bold text-center transition-all">
+                    Pesan Notifikasi
+                </div>
             </div>
         </div>
 
-        <!-- BAGIAN KANAN: TAMBAH / EDIT MANUAL -->
-        <div class="p-8 md:w-1/2 bg-slate-50">
-            <div class="mb-6 flex items-center gap-3">
-                <div class="p-3 bg-green-100 text-green-600 rounded-xl">
-                    <i class="ph-fill ph-user-plus text-2xl"></i>
-                </div>
+        <!-- ========================================== -->
+        <!-- VIEW 2: DATABASE PEMILIH (Tabel & Filter) -->
+        <!-- ========================================== -->
+        <div id="view-database" class="hidden flex-col w-full p-8 bg-white min-h-[500px]">
+            <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-800">Tambah / Edit Manual</h2>
-                    <p class="text-slate-500 text-xs mt-1">Gunakan untuk data susulan atau perbaikan nama.</p>
-                </div>
-            </div>
-
-            <form id="form-manual" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">NISN / NIP (ID Pemilih)</label>
-                    <input type="text" id="manual-id" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="Contoh: 1234567890">
-                    <p class="text-[10px] text-slate-400 mt-1">*Jika NISN sudah ada, sistem akan mengubah datanya.</p>
+                    <h2 class="text-xl font-bold text-slate-800">Daftar Pemilih Terdaftar</h2>
+                    <p class="text-slate-500 text-xs mt-1">Total data: <span id="total-voters-text" class="font-bold text-blue-600">0</span> orang</p>
                 </div>
                 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="manual-name" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none uppercase" placeholder="Masukkan nama...">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Sebagai (Role)</label>
-                    <select id="manual-role" class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
-                        <option value="Siswa">Siswa</option>
-                        <option value="Guru">Guru/Staf</option>
-                    </select>
-                </div>
-
-                <div class="pt-2">
-                    <button type="submit" id="btn-manual-submit" class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-md transition-all flex justify-center items-center gap-2">
-                        <i class="ph-bold ph-floppy-disk text-lg"></i>
-                        Simpan Data Pemilih
+                <!-- Filter Pencarian -->
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="relative">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
+                        <input type="text" id="filter-nisn" placeholder="Cari NISN..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-40">
+                    </div>
+                    <div class="relative">
+                        <i class="ph ph-text-aa absolute left-3 top-2.5 text-slate-400"></i>
+                        <input type="text" id="filter-name" placeholder="Cari Nama..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase w-full sm:w-56">
+                    </div>
+                    <button id="btn-refresh-data" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-arrows-clockwise"></i> Refresh
                     </button>
                 </div>
-            </form>
-
-            <div id="manual-alert" class="mt-4 hidden p-3 rounded-lg text-xs font-bold text-center transition-all">
-                Pesan Notifikasi
             </div>
+
+            <!-- Tabel Data -->
+            <div class="w-full overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-sm text-left whitespace-nowrap">
+                    <thead class="text-xs text-slate-500 bg-slate-50 uppercase font-bold">
+                        <tr>
+                            <th scope="col" class="px-6 py-4">No</th>
+                            <th scope="col" class="px-6 py-4">NISN / NIP</th>
+                            <th scope="col" class="px-6 py-4">Nama Lengkap</th>
+                            <th scope="col" class="px-6 py-4">Status / Role</th>
+                            <th scope="col" class="px-6 py-4 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-slate-100">
+                        <!-- Data akan dirender di sini via JS -->
+                        <tr>
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-500">
+                                <div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                                Memuat data dari server...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-slate-400 mt-3 text-center">*Menampilkan maksimal 100 hasil pencarian teratas agar sistem tetap ringan.</p>
         </div>
 
     </div>
 
+    <!-- KONFIRMASI HAPUS MODAL (NATIVE) -->
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =====================================================================
-        // ⚠️ PENTING: GANTI DENGAN KUNCI FIREBASE (CONFIG) MILIK ANDA!
+        // ⚠️ KONFIGURASI FIREBASE (Biarkan default jika sudah sesuai)
         // =====================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCzeg9t7CjeoxNB9DaNK10NsHixk0LC9UA",
@@ -121,10 +204,43 @@
         const db = getFirestore(app);
         const appId = 'osis-sman1ngawi-app'; // Prefix database SAMA PERSIS dengan aplikasi utama
 
-        // Pastikan kita login secara anonim agar diizinkan Security Rules
+        // Login Anonim untuk bypass Security Rules
         signInAnonymously(auth).catch(err => console.error("Gagal login anonim:", err));
 
-        // --- ELEMEN DOM UPLOAD MASSAL ---
+        // --- MANAJEMEN TAB NAVIGASI ---
+        const tabInput = document.getElementById('tab-input');
+        const tabDatabase = document.getElementById('tab-database');
+        const viewInput = document.getElementById('view-input');
+        const viewDatabase = document.getElementById('view-database');
+
+        function switchTab(tabName) {
+            if(tabName === 'input') {
+                viewInput.classList.remove('hidden');
+                viewInput.classList.add('flex');
+                viewDatabase.classList.add('hidden');
+                viewDatabase.classList.remove('flex');
+                
+                tabInput.className = "flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2";
+                tabDatabase.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
+            } else {
+                viewInput.classList.add('hidden');
+                viewInput.classList.remove('flex');
+                viewDatabase.classList.remove('hidden');
+                viewDatabase.classList.add('flex');
+
+                tabDatabase.className = "flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2";
+                tabInput.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
+                
+                // Refresh data otomatis saat tab database dibuka
+                if(allVoters.length === 0) fetchVoters(); 
+            }
+        }
+
+        tabInput.addEventListener('click', () => switchTab('input'));
+        tabDatabase.addEventListener('click', () => switchTab('database'));
+
+
+        // --- LOGIKA UPLOAD MASSAL ---
         const btnUpload = document.getElementById('btn-upload');
         const fileInput = document.getElementById('csv-file');
         const statusArea = document.getElementById('status-area');
@@ -132,7 +248,6 @@
         const progressText = document.getElementById('progress-text');
         const logMessage = document.getElementById('log-message');
 
-        // --- LOGIKA UPLOAD MASSAL ---
         btnUpload.addEventListener('click', async () => {
             const file = fileInput.files[0];
             if (!file) return alert("Silakan pilih file CSV terlebih dahulu!");
@@ -167,14 +282,13 @@
                         if (nisn && nama) {
                             try {
                                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
-                                await setDoc(docRef, { name: nama, role: role }, { merge: true }); // Pakai merge agar aman
+                                await setDoc(docRef, { name: nama, role: role }, { merge: true });
                                 successCount++;
                             } catch (err) {
                                 console.error(`Gagal NISN ${nisn}:`, err);
                             }
                         }
 
-                        // Update loading bar
                         const percent = Math.round(((i + 1) / total) * 100);
                         progressBar.style.width = `${percent}%`;
                         progressText.textContent = `${i + 1} / ${total}`;
@@ -184,6 +298,9 @@
                     logMessage.className = "text-xs text-center font-bold text-green-600 mt-3";
                     alert(`Upload Massal Selesai!\nBerhasil: ${successCount} dari ${total} baris.`);
                     resetBulkUI(true);
+                    
+                    // Kosongkan array cache agar mengambil ulang jika ke tab Database
+                    allVoters = []; 
                 },
                 error: function(err) {
                     alert("Gagal membaca file: " + err.message);
@@ -199,14 +316,16 @@
             fileInput.value = '';
         }
 
-        // --- STREAMING_CHUNK:Menambahkan logika input manual... ---
+        // --- STREAMING_CHUNK:Logika Tambah dan Edit Data Manual... ---
         // --- LOGIKA TAMBAH/EDIT MANUAL ---
         const formManual = document.getElementById('form-manual');
         const manualId = document.getElementById('manual-id');
         const manualName = document.getElementById('manual-name');
         const manualRole = document.getElementById('manual-role');
         const btnManualSubmit = document.getElementById('btn-manual-submit');
+        const btnCancelEdit = document.getElementById('btn-cancel-edit');
         const manualAlert = document.getElementById('manual-alert');
+        const txtSubmit = document.getElementById('text-manual-submit');
 
         formManual.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -219,33 +338,174 @@
             btnManualSubmit.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Menyimpan...`;
 
             try {
-                // Menyimpan data ke Firebase. 
-                // Jika NISN sudah ada -> data lama ditimpa (Update).
-                // Jika NISN belum ada -> membuat data baru (Insert).
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
                 await setDoc(docRef, { name: nama, role: role }, { merge: true });
 
-                // Tampilkan pesan sukses
                 manualAlert.classList.remove('hidden', 'bg-red-100', 'text-red-700');
                 manualAlert.classList.add('bg-green-100', 'text-green-700');
                 manualAlert.innerHTML = `<i class="ph-fill ph-check-circle mr-1"></i> Data <strong>${nama}</strong> (${nisn}) berhasil disimpan!`;
                 
-                // Reset form
-                formManual.reset();
+                resetManualForm();
+                
+                // Update array di local agar tidak perlu fetch seluruh DB lagi
+                const existingIndex = allVoters.findIndex(v => v.id === nisn);
+                if(existingIndex >= 0) {
+                    allVoters[existingIndex] = { id: nisn, name: nama, role: role };
+                } else {
+                    allVoters.push({ id: nisn, name: nama, role: role });
+                }
+                renderTable();
 
             } catch (error) {
                 console.error(error);
                 manualAlert.classList.remove('hidden', 'bg-green-100', 'text-green-700');
                 manualAlert.classList.add('bg-red-100', 'text-red-700');
-                manualAlert.innerHTML = `<i class="ph-fill ph-x-circle mr-1"></i> Gagal menyimpan. Periksa koneksi internet Anda.`;
+                manualAlert.innerHTML = `<i class="ph-fill ph-x-circle mr-1"></i> Gagal menyimpan data.`;
             } finally {
                 btnManualSubmit.disabled = false;
-                btnManualSubmit.innerHTML = `<i class="ph-bold ph-floppy-disk text-lg"></i> Simpan Data Pemilih`;
+                btnManualSubmit.innerHTML = `<i class="ph-bold ph-floppy-disk text-lg"></i> <span id="text-manual-submit">Simpan Data</span>`;
                 
-                // Hilangkan notifikasi setelah 5 detik
-                setTimeout(() => {
-                    manualAlert.classList.add('hidden');
-                }, 5000);
+                setTimeout(() => { manualAlert.classList.add('hidden'); }, 4000);
+            }
+        });
+
+        function resetManualForm() {
+            formManual.reset();
+            manualId.readOnly = false;
+            manualId.classList.remove('bg-slate-100', 'text-slate-500');
+            btnCancelEdit.classList.add('hidden');
+            document.getElementById('text-manual-submit').textContent = 'Simpan Data';
+        }
+
+        btnCancelEdit.addEventListener('click', resetManualForm);
+
+        // --- STREAMING_CHUNK:Logika Database (Tampil, Filter, Hapus)... ---
+        // --- LOGIKA DATABASE & TABEL (FITUR BARU) ---
+        let allVoters = [];
+        const tableBody = document.getElementById('table-body');
+        const totalVotersText = document.getElementById('total-voters-text');
+        
+        const filterNisn = document.getElementById('filter-nisn');
+        const filterName = document.getElementById('filter-name');
+        const btnRefreshData = document.getElementById('btn-refresh-data');
+
+        async function fetchVoters() {
+            tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Memuat data dari server...</td></tr>`;
+            btnRefreshData.disabled = true;
+
+            try {
+                const votersCol = collection(db, 'artifacts', appId, 'public', 'data', 'voters_list');
+                const snapshot = await getDocs(votersCol);
+                
+                allVoters = [];
+                snapshot.forEach((doc) => {
+                    allVoters.push({ id: doc.id, ...doc.data() });
+                });
+                
+                renderTable();
+            } catch(e) {
+                console.error("Gagal mengambil data:", e);
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-500 font-bold">Gagal memuat data. Periksa koneksi internet.</td></tr>`;
+            } finally {
+                btnRefreshData.disabled = false;
+            }
+        }
+
+        function renderTable() {
+            const valNisn = filterNisn.value.toLowerCase().trim();
+            const valName = filterName.value.toLowerCase().trim();
+
+            // Filter data berdasarkan input
+            let filtered = allVoters.filter(v => {
+                const matchNisn = v.id.toLowerCase().includes(valNisn);
+                const matchName = v.name.toLowerCase().includes(valName);
+                return matchNisn && matchName;
+            });
+
+            totalVotersText.textContent = allVoters.length;
+            
+            // Batasi tampilan maksimal 100 baris agar browser tidak ngelag
+            const displayData = filtered.slice(0, 100);
+
+            if(displayData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500 italic">Tidak ada data yang ditemukan.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = displayData.map((v, index) => `
+                <tr class="hover:bg-slate-50 transition-colors group">
+                    <td class="px-6 py-4 text-slate-500">${index + 1}</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${v.id}</td>
+                    <td class="px-6 py-4 text-slate-700">${v.name}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${v.role === 'Panitia' ? 'bg-purple-100 text-purple-700' : (v.role === 'Guru' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700')}">
+                            ${v.role || 'Siswa'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button class="btn-edit p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-md transition-colors" data-id="${v.id}" data-name="${v.name}" data-role="${v.role}" title="Edit">
+                                <i class="ph-bold ph-pencil-simple text-base"></i>
+                            </button>
+                            <button class="btn-delete p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md transition-colors" data-id="${v.id}" data-name="${v.name}" title="Hapus">
+                                <i class="ph-bold ph-trash text-base"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Listener Filter
+        filterNisn.addEventListener('input', renderTable);
+        filterName.addEventListener('input', renderTable);
+        btnRefreshData.addEventListener('click', fetchVoters);
+
+        // Listener Aksi Edit & Hapus (Event Delegation di tableBody)
+        tableBody.addEventListener('click', async (e) => {
+            const btnEdit = e.target.closest('.btn-edit');
+            const btnDelete = e.target.closest('.btn-delete');
+
+            if(btnEdit) {
+                // Aksi Edit: Pindah ke Tab Input dan Isi Form
+                const { id, name, role } = btnEdit.dataset;
+                
+                switchTab('input');
+                
+                manualId.value = id;
+                manualId.readOnly = true; // Kunci NISN saat edit
+                manualId.classList.add('bg-slate-100', 'text-slate-500');
+                
+                manualName.value = name;
+                manualRole.value = role;
+                
+                document.getElementById('text-manual-submit').textContent = 'Update Data';
+                btnCancelEdit.classList.remove('hidden');
+                
+                // Scroll ke form
+                viewInput.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            if(btnDelete) {
+                // Aksi Hapus
+                const { id, name } = btnDelete.dataset;
+                const confirmDelete = confirm(`PERINGATAN!\nApakah Anda yakin ingin MENGHAPUS data pemilih:\n\nNama: ${name}\nNISN: ${id}\n\nTindakan ini tidak dapat dibatalkan.`);
+                
+                if(confirmDelete) {
+                    try {
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', id);
+                        await deleteDoc(docRef);
+                        
+                        // Hapus dari local array
+                        allVoters = allVoters.filter(v => v.id !== id);
+                        renderTable(); // Update tampilan tabel
+                        
+                        alert(`Data ${name} berhasil dihapus.`);
+                    } catch(err) {
+                        console.error("Gagal menghapus:", err);
+                        alert("Gagal menghapus data. Periksa koneksi Anda.");
+                    }
+                }
             }
         });
 
