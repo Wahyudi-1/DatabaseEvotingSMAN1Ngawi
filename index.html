@@ -52,6 +52,12 @@
                 <div class="bg-blue-50 p-4 rounded-xl mb-6 text-xs text-blue-800 border border-blue-100">
                     <strong>Format Header CSV (Baris 1):</strong><br>
                     <code class="font-bold bg-blue-100 px-1 py-0.5 rounded">nisn, nama, role</code>
+                    
+                    <div class="mt-3 pt-3 border-t border-blue-200">
+                        <button id="btn-download-template" class="flex items-center gap-1.5 text-blue-700 font-bold hover:text-blue-900 transition-colors bg-white px-3 py-1.5 rounded-lg border border-blue-200 shadow-sm hover:bg-blue-100 w-full justify-center sm:w-auto">
+                            <i class="ph-bold ph-download-simple text-base"></i> Download Contoh Template CSV
+                        </button>
+                    </div>
                 </div>
 
                 <input type="file" id="csv-file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all mb-6 cursor-pointer border border-slate-200 rounded-xl p-2 bg-slate-50">
@@ -239,6 +245,22 @@
         tabInput.addEventListener('click', () => switchTab('input'));
         tabDatabase.addEventListener('click', () => switchTab('database'));
 
+        const btnDownloadTemplate = document.getElementById('btn-download-template');
+        btnDownloadTemplate.addEventListener('click', () => {
+            // Isi template dummy data
+            const csvContent = "nisn,nama,role\n1234567890,BUDI SANTOSO,Siswa\n198001012005011001,PAK GURU S.PD,Guru\n9876543210,SITI AMINAH,Siswa\nREKAP2026,PANITIA UTAMA,Panitia";
+            
+            // Membuat dan mengunduh file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "template_data_pemilih.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
 
         // --- LOGIKA UPLOAD MASSAL ---
         const btnUpload = document.getElementById('btn-upload');
