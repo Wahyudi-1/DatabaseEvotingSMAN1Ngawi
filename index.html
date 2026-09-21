@@ -7,13 +7,76 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* ========================================== */
+        /* CSS KHUSUS TAMPILAN KERTAS A4 & CETAK      */
+        /* ========================================== */
+        
+        /* Area Pratinjau (Preview di Layar) */
+        .a4-page {
+            width: 21cm;
+            min-height: 29.7cm;
+            background: white;
+            margin: 0 auto 2cm auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            padding: 1cm;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 Kolom */
+            grid-template-rows: repeat(4, 1fr);    /* 4 Baris = 16 Kartu */
+            gap: 10px;
+        }
+        
+        /* Desain Kartu Pemilih */
+        .card-print {
+            border: 1.5px solid #64748b;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: white;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+        .school-header-print { font-size: 10px; font-weight: bold; color: #1e293b; border-bottom: 1.5px dashed #cbd5e1; padding-bottom: 6px; margin-bottom: 6px; }
+        .qr-container-print { display: flex; justify-content: center; margin: 4px 0; }
+        .qr-box-print { padding: 4px; border: 1px solid #e2e8f0; border-radius: 4px; display: inline-block; background: white; }
+        .voter-name-print { font-size: 11px; font-weight: 900; color: #0f172a; text-transform: uppercase; margin-top: 4px; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .voter-nisn-print { font-size: 10px; color: #475569; margin-top: 2px; font-weight: bold; }
+        .voter-role-print { font-size: 9px; font-weight: bold; margin-top: 4px; display: inline-block; padding: 2px 6px; border: 1px solid #334155; border-radius: 10px; text-transform: uppercase; }
+
+        /* Aturan Khusus Saat Printer Bekerja (Ctrl+P) */
+        @media print {
+            body { background: white !important; padding: 0 !important; margin: 0 !important; }
+            .no-print { display: none !important; }
+            
+            #app-view { padding: 0 !important; display: block !important; }
+            .main-card { border: none !important; box-shadow: none !important; max-width: 100% !important; border-radius: 0 !important; overflow: visible !important; display: block !important;}
+            #view-print { background: white !important; display: block !important;}
+            #print-pages-container { padding: 0 !important; overflow: visible !important; display: block !important; }
+            
+            .a4-page {
+                width: 100%;
+                min-height: auto;
+                margin: 0;
+                box-shadow: none;
+                padding: 0; /* Biarkan printer yang mengatur margin tepi kertas */
+                page-break-after: always; /* Memaksa printer ganti halaman untuk tiap A4 */
+                gap: 5px; /* Kurangi gap sedikit saat dicetak */
+            }
+            .card-print { padding: 8px; }
+        }
+    </style>
 </head>
 <body class="bg-slate-100 min-h-screen relative font-sans">
 
     <!-- ========================================== -->
     <!-- VIEW: HALAMAN LOGIN -->
     <!-- ========================================== -->
-    <div id="login-view" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-100 min-h-screen p-4">
+    <div id="login-view" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-100 min-h-screen p-4 no-print">
         <div class="w-full max-w-md text-center mb-6">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4 shadow-sm border border-blue-200">
                 <i class="ph-fill ph-shield-check text-4xl"></i>
@@ -51,8 +114,9 @@
     <!-- VIEW: APLIKASI UTAMA (DASHBOARD) -->
     <!-- ========================================== -->
     <div id="app-view" class="hidden flex-col items-center w-full p-4 md:p-6 min-h-screen">
-        <!-- Header Panel -->
-        <div class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        
+        <!-- Header Top -->
+        <div class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 no-print">
             <div>
                 <h1 class="text-2xl font-extrabold text-slate-800">Panel Admin Pemilih</h1>
                 <p class="text-slate-500 text-sm">Sistem E-Voting OSIS SMAN 1 Ngawi</p>
@@ -71,21 +135,24 @@
         </div>
 
         <!-- Main Card -->
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-5xl border border-slate-200 overflow-hidden flex flex-col relative">
+        <div class="main-card bg-white rounded-2xl shadow-xl w-full max-w-5xl border border-slate-200 overflow-hidden flex flex-col relative">
             
-            <!-- Tab Navigasi -->
-            <div class="flex border-b border-slate-200 bg-slate-50">
+            <!-- Tab Navigasi (Tiga Menu Sekarang) -->
+            <div class="flex border-b border-slate-200 bg-slate-50 no-print flex-col sm:flex-row">
                 <button id="tab-input" class="flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2">
                     <i class="ph-bold ph-plus-circle text-lg"></i> Input Data
                 </button>
                 <button id="tab-database" class="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2">
                     <i class="ph-bold ph-database text-lg"></i> Database Pemilih
                 </button>
+                <button id="tab-print" class="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2">
+                    <i class="ph-bold ph-printer text-lg"></i> Cetak Kartu
+                </button>
             </div>
 
             <!-- VIEW 1: INPUT DATA -->
-            <div id="view-input" class="flex flex-col md:flex-row w-full">
-                <!-- BAGIAN KIRI: UPLOAD MASSAL (CSV) -->
+            <div id="view-input" class="flex flex-col md:flex-row w-full no-print">
+                <!-- BAGIAN KIRI: UPLOAD MASSAL -->
                 <div class="p-8 md:w-1/2 bg-white border-b md:border-b-0 md:border-r border-slate-100">
                     <div class="mb-6 flex items-center gap-3">
                         <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
@@ -179,14 +246,14 @@
             </div>
 
             <!-- VIEW 2: DATABASE PEMILIH -->
-            <div id="view-database" class="hidden flex-col w-full p-8 bg-white min-h-[500px]">
+            <div id="view-database" class="hidden flex-col w-full p-8 bg-white min-h-[500px] no-print">
                 <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800">Daftar Pemilih Terdaftar</h2>
                         <p class="text-slate-500 text-xs mt-1">Total data: <span id="total-voters-text" class="font-bold text-blue-600">0</span> orang</p>
                     </div>
                     
-                    <!-- Filter Pencarian & Cetak Kartu -->
+                    <!-- Filter Pencarian -->
                     <div class="flex flex-col sm:flex-row gap-2">
                         <div class="relative">
                             <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
@@ -199,9 +266,8 @@
                         <button id="btn-refresh-data" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all flex items-center justify-center gap-2" title="Refresh Tabel">
                             <i class="ph-bold ph-arrows-clockwise"></i>
                         </button>
-                        <!-- TOMBOL CETAK KARTU BER-QR CODE -->
-                        <button id="btn-print-cards" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
-                            <i class="ph-bold ph-printer"></i> Cetak Kartu
+                        <button id="btn-export-csv" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-download-simple"></i> Export CSV
                         </button>
                     </div>
                 </div>
@@ -219,7 +285,6 @@
                             </tr>
                         </thead>
                         <tbody id="table-body" class="divide-y divide-slate-100">
-                            <!-- Data akan dirender di sini via JS -->
                             <tr>
                                 <td colspan="5" class="px-6 py-10 text-center text-slate-500">
                                     Menunggu proses login...
@@ -228,7 +293,31 @@
                         </tbody>
                     </table>
                 </div>
-                <p class="text-xs text-slate-400 mt-3 text-center">*Menampilkan maksimal 100 hasil pencarian teratas agar sistem tetap ringan. Namun fungsi Cetak Kartu akan mencetak SELURUH data.</p>
+                <p class="text-xs text-slate-400 mt-3 text-center">*Menampilkan maksimal 100 hasil pencarian teratas agar browser tidak lambat.</p>
+            </div>
+
+            <!-- VIEW 3: CETAK KARTU (PREVIEW A4) -->
+            <div id="view-print" class="hidden flex-col w-full bg-slate-200 min-h-[500px]">
+                
+                <!-- Bilah Kontrol Cetak (Tidak ikut terprint) -->
+                <div class="flex justify-between items-center p-4 bg-white border-b border-slate-200 sticky top-0 z-10 no-print shadow-sm">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800"><i class="ph-fill ph-printer text-purple-600 mr-1"></i> Preview Kertas A4</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Memuat <span id="print-total-voters" class="font-bold text-slate-700">0</span> kartu dalam <span id="print-total-pages" class="font-bold text-slate-700">0</span> halaman.</p>
+                    </div>
+                    <button id="btn-execute-print" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg shadow-md transition-all flex items-center gap-2">
+                        <i class="ph-bold ph-printer text-lg"></i> Cetak Sekarang
+                    </button>
+                </div>
+
+                <!-- Container untuk menampung lembaran-lembaran A4 -->
+                <div id="print-pages-container" class="p-8 overflow-y-auto flex flex-col items-center w-full">
+                    <!-- Lembaran A4 akan di-inject ke sini via JavaScript -->
+                    <div class="text-center text-slate-500 mt-10 no-print">
+                        <div class="w-8 h-8 border-4 border-slate-300 border-t-purple-600 rounded-full animate-spin mx-auto mb-3"></div>
+                        Menyiapkan pratinjau kartu...
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -240,9 +329,7 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // =====================================================================
         // KONFIGURASI FIREBASE
-        // =====================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCzeg9t7CjeoxNB9DaNK10NsHixk0LC9UA",
             authDomain: "e-voting-6f923.firebaseapp.com",
@@ -256,7 +343,7 @@
         const db = getFirestore(app);
         const appId = 'osis-sman1ngawi-app'; 
 
-        let allVoters = [];
+        let allVoters = []; // Variabel global penyimpan data sementara
 
         // =====================================================================
         // LOGIKA AUTENTIKASI (LOGIN & LOGOUT)
@@ -278,6 +365,8 @@
                 
                 if(document.getElementById('view-database').classList.contains('flex')) {
                     fetchVoters();
+                } else if(document.getElementById('view-print').classList.contains('flex')) {
+                    fetchVoters().then(generatePrintPreview);
                 }
             } else {
                 loginView.classList.remove('hidden');
@@ -308,7 +397,6 @@
                     btnLoginSubmit.disabled = false;
                     btnLoginSubmit.innerHTML = `<i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem`;
                     loginError.classList.remove('hidden');
-                    console.error("Gagal Login:", error);
                 });
         });
 
@@ -323,32 +411,49 @@
         // =====================================================================
         const tabInput = document.getElementById('tab-input');
         const tabDatabase = document.getElementById('tab-database');
+        const tabPrint = document.getElementById('tab-print');
+        
         const viewInput = document.getElementById('view-input');
         const viewDatabase = document.getElementById('view-database');
+        const viewPrint = document.getElementById('view-print');
+
+        const activeTabClass = "flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2";
+        const inactiveTabClass = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
 
         function switchTab(tabName) {
-            if(tabName === 'input') {
-                viewInput.classList.remove('hidden');
-                viewInput.classList.add('flex');
-                viewDatabase.classList.add('hidden');
-                viewDatabase.classList.remove('flex');
-                
-                tabInput.className = "flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2";
-                tabDatabase.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
-            } else {
-                viewInput.classList.add('hidden');
-                viewInput.classList.remove('flex');
-                viewDatabase.classList.remove('hidden');
-                viewDatabase.classList.add('flex');
+            // Sembunyikan Semua View
+            viewInput.classList.add('hidden'); viewInput.classList.remove('flex');
+            viewDatabase.classList.add('hidden'); viewDatabase.classList.remove('flex');
+            viewPrint.classList.add('hidden'); viewPrint.classList.remove('flex');
 
-                tabDatabase.className = "flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2";
-                tabInput.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
-                
+            // Reset Tab Class
+            tabInput.className = inactiveTabClass;
+            tabDatabase.className = inactiveTabClass;
+            tabPrint.className = inactiveTabClass;
+
+            // Aktifkan yang dipilih
+            if(tabName === 'input') {
+                viewInput.classList.remove('hidden'); viewInput.classList.add('flex');
+                tabInput.className = activeTabClass;
+            } else if (tabName === 'database') {
+                viewDatabase.classList.remove('hidden'); viewDatabase.classList.add('flex');
+                tabDatabase.className = activeTabClass;
                 if(auth.currentUser && allVoters.length === 0) fetchVoters(); 
+            } else if (tabName === 'print') {
+                viewPrint.classList.remove('hidden'); viewPrint.classList.add('flex');
+                tabPrint.className = activeTabClass;
+                
+                // Pastikan data ada sebelum men-generate preview
+                if(auth.currentUser && allVoters.length === 0) {
+                    fetchVoters().then(generatePrintPreview);
+                } else {
+                    generatePrintPreview();
+                }
             }
         }
         tabInput.addEventListener('click', () => switchTab('input'));
         tabDatabase.addEventListener('click', () => switchTab('database'));
+        tabPrint.addEventListener('click', () => switchTab('print'));
 
         // =====================================================================
         // LOGIKA DOWNLOAD TEMPLATE & UPLOAD MASSAL
@@ -376,23 +481,18 @@
             const file = fileInput.files[0];
             if (!file) return alert("Silakan pilih file CSV terlebih dahulu!");
 
-            btnUpload.disabled = true;
-            fileInput.disabled = true;
+            btnUpload.disabled = true; fileInput.disabled = true;
             statusArea.classList.remove('hidden');
             logMessage.textContent = "Membaca file CSV...";
             logMessage.className = "text-xs text-center text-blue-500 mt-3";
 
             Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
+                header: true, skipEmptyLines: true,
                 complete: async function(results) {
                     const data = results.data;
                     const total = data.length;
                     
-                    if (total === 0) {
-                        alert("File CSV kosong.");
-                        resetBulkUI(); return;
-                    }
+                    if (total === 0) { alert("File CSV kosong."); resetBulkUI(); return; }
 
                     let successCount = 0;
                     logMessage.textContent = "Sedang memproses... JANGAN TUTUP HALAMAN!";
@@ -408,13 +508,9 @@
                                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
                                 await setDoc(docRef, { name: nama, role: role }, { merge: true });
                                 successCount++;
-                            } catch (err) {
-                                console.error(`Gagal NISN ${nisn}:`, err);
-                            }
+                            } catch (err) { console.error(`Gagal NISN ${nisn}:`, err); }
                         }
-
-                        const percent = Math.round(((i + 1) / total) * 100);
-                        progressBar.style.width = `${percent}%`;
+                        progressBar.style.width = `${Math.round(((i + 1) / total) * 100)}%`;
                         progressText.textContent = `${i + 1} / ${total}`;
                     }
 
@@ -422,19 +518,14 @@
                     logMessage.className = "text-xs text-center font-bold text-green-600 mt-3";
                     alert(`Upload Massal Selesai!\nBerhasil: ${successCount} dari ${total} baris.`);
                     resetBulkUI(true);
-                    
-                    allVoters = []; 
+                    allVoters = []; // Reset agar memuat data terbaru jika pindah tab
                 },
-                error: function(err) {
-                    alert("Gagal membaca file: " + err.message);
-                    resetBulkUI();
-                }
+                error: function(err) { alert("Gagal membaca file: " + err.message); resetBulkUI(); }
             });
         });
 
         function resetBulkUI(success = false) {
-            btnUpload.disabled = false;
-            fileInput.disabled = false;
+            btnUpload.disabled = false; fileInput.disabled = false;
             if (!success) statusArea.classList.add('hidden');
             fileInput.value = '';
         }
@@ -463,17 +554,14 @@
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
                 await setDoc(docRef, { name: nama, role: role }, { merge: true });
 
-                manualAlert.classList.remove('hidden', 'bg-red-100', 'text-red-700');
-                manualAlert.classList.add('bg-green-100', 'text-green-700');
+                manualAlert.className = 'mt-4 p-3 rounded-lg text-xs font-bold text-center transition-all bg-green-100 text-green-700';
                 manualAlert.innerHTML = `<i class="ph-fill ph-check-circle mr-1"></i> Data <strong>${nama}</strong> (${nisn}) berhasil disimpan!`;
                 
                 resetManualForm();
                 allVoters = []; 
 
             } catch (error) {
-                console.error(error);
-                manualAlert.classList.remove('hidden', 'bg-green-100', 'text-green-700');
-                manualAlert.classList.add('bg-red-100', 'text-red-700');
+                manualAlert.className = 'mt-4 p-3 rounded-lg text-xs font-bold text-center transition-all bg-red-100 text-red-700';
                 manualAlert.innerHTML = `<i class="ph-fill ph-x-circle mr-1"></i> Gagal menyimpan data.`;
             } finally {
                 btnManualSubmit.disabled = false;
@@ -492,29 +580,34 @@
         btnCancelEdit.addEventListener('click', resetManualForm);
 
         // =====================================================================
-        // LOGIKA DATABASE & TABEL
+        // LOGIKA MENGAMBIL DATA (DATABASE & TABEL)
         // =====================================================================
         const tableBody = document.getElementById('table-body');
         const filterNisn = document.getElementById('filter-nisn');
         const filterName = document.getElementById('filter-name');
 
-        async function fetchVoters() {
-            tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Memuat data dari server...</td></tr>`;
-            
-            try {
-                const votersCol = collection(db, 'artifacts', appId, 'public', 'data', 'voters_list');
-                const snapshot = await getDocs(votersCol);
+        // fetchVoters diubah menjadi fungsi yang mengembalikan Promise
+        function fetchVoters() {
+            return new Promise(async (resolve, reject) => {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Memuat data dari server...</td></tr>`;
                 
-                allVoters = [];
-                snapshot.forEach((doc) => {
-                    allVoters.push({ id: doc.id, ...doc.data() });
-                });
-                
-                renderTable();
-            } catch(e) {
-                console.error("Gagal mengambil data:", e);
-                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-500 font-bold">Gagal memuat data. Periksa koneksi internet / Hak Akses.</td></tr>`;
-            }
+                try {
+                    const votersCol = collection(db, 'artifacts', appId, 'public', 'data', 'voters_list');
+                    const snapshot = await getDocs(votersCol);
+                    
+                    allVoters = [];
+                    snapshot.forEach((doc) => {
+                        allVoters.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    renderTable();
+                    resolve(allVoters);
+                } catch(e) {
+                    console.error("Gagal mengambil data:", e);
+                    tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-500 font-bold">Gagal memuat data. Periksa koneksi internet.</td></tr>`;
+                    reject(e);
+                }
+            });
         }
 
         function renderTable() {
@@ -522,9 +615,7 @@
             const valName = filterName.value.toLowerCase().trim();
 
             let filtered = allVoters.filter(v => {
-                const matchNisn = v.id.toLowerCase().includes(valNisn);
-                const matchName = v.name.toLowerCase().includes(valName);
-                return matchNisn && matchName;
+                return v.id.toLowerCase().includes(valNisn) && v.name.toLowerCase().includes(valName);
             });
 
             document.getElementById('total-voters-text').textContent = allVoters.length;
@@ -563,240 +654,17 @@
         filterName.addEventListener('input', renderTable);
         document.getElementById('btn-refresh-data').addEventListener('click', fetchVoters);
 
-        // =====================================================================
-        // FITUR CETAK KARTU PEMILIH BER-QR CODE (16 per A4)
-        // =====================================================================
-        document.getElementById('btn-print-cards').addEventListener('click', () => {
-            if (allVoters.length === 0) {
-                return alert("Belum ada data untuk dicetak!");
-            }
-            
-            if (allVoters.length > 500) {
-                const lanjut = confirm(`Peringatan: Anda akan mencetak ${allVoters.length} kartu sekaligus. Proses ini mungkin memakan waktu agak lama. Lanjutkan?`);
-                if(!lanjut) return;
-            }
-
-            const printWindow = window.open('', '_blank');
-            
-            let htmlContent = `
-            <!DOCTYPE html>
-            <html lang="id">
-            <head>
-                <meta charset="UTF-8">
-                <title>Preview Kartu Pemilih E-Voting</title>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-                <style>
-                    * { box-sizing: border-box; }
-                    body { 
-                        font-family: 'Arial', sans-serif; 
-                        margin: 0; 
-                        background: #e2e8f0; 
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        padding-top: 60px; /* Space for the fixed print button bar */
-                    }
-
-                    /* --- PRINT BUTTON BAR (Only visible on screen) --- */
-                    .print-action-bar {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        background: white;
-                        padding: 15px 20px;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        z-index: 1000;
-                    }
-                    .print-action-bar h2 { margin: 0; font-size: 18px; color: #1e293b; }
-                    .btn-print {
-                        background: #4f46e5;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        font-size: 14px;
-                    }
-                    .btn-print:hover { background: #4338ca; }
-
-                    /* --- A4 PAGE SETUP --- */
-                    .page { 
-                        width: 21cm; 
-                        height: 29.7cm; /* Exact A4 dimensions */
-                        background: white;
-                        margin-bottom: 2cm; /* Gap between pages in preview */
-                        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-                        padding: 1cm; /* Margins for printing */
-                        display: grid; 
-                        /* 4 columns x 4 rows = 16 cards */
-                        grid-template-columns: repeat(4, 1fr); 
-                        grid-template-rows: repeat(4, 1fr); 
-                        gap: 10px;
-                    }
-                    
-                    /* --- CARD STYLING --- */
-                    .card { 
-                        border: 1.5px solid #64748b; 
-                        border-radius: 8px; 
-                        padding: 10px; 
-                        text-align: center; 
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: space-between;
-                    }
-                    .school-header { 
-                        font-size: 10px; 
-                        font-weight: bold; 
-                        color: #1e293b;
-                        border-bottom: 1.5px dashed #cbd5e1; 
-                        padding-bottom: 6px; 
-                        margin-bottom: 8px; 
-                    }
-                    .qr-container { 
-                        display: flex; 
-                        justify-content: center; 
-                        margin: 5px 0; 
-                    }
-                    .qr-box {
-                        padding: 3px;
-                        border: 1px solid #e2e8f0;
-                        border-radius: 3px;
-                    }
-                    .voter-name { 
-                        font-size: 11px; 
-                        font-weight: 900; 
-                        color: #0f172a;
-                        text-transform: uppercase; 
-                        margin-top: 4px; 
-                        line-height: 1.1;
-                        /* Truncate long names to prevent layout breaking */
-                        display: -webkit-box;
-                        -webkit-line-clamp: 2;
-                        -webkit-box-orient: vertical;
-                        overflow: hidden;
-                    }
-                    .voter-nisn { 
-                        font-size: 10px; 
-                        color: #475569;
-                        margin-top: 3px; 
-                        font-weight: bold;
-                    }
-                    .voter-role { 
-                        font-size: 9px; 
-                        font-weight: bold; 
-                        margin-top: 5px; 
-                        display: inline-block; 
-                        padding: 2px 6px; 
-                        border: 1px solid #334155; 
-                        border-radius: 10px; 
-                        text-transform: uppercase;
-                    }
-                    
-                    /* --- PRINT SPECIFIC STYLES --- */
-                    @media print {
-                        body { 
-                            background: none; 
-                            padding: 0; 
-                        }
-                        .print-action-bar { 
-                            display: none; /* Hide the bar when actually printing */
-                        }
-                        .page { 
-                            box-shadow: none; 
-                            margin: 0;
-                            page-break-after: always; /* Force new page for each .page container */
-                            /* Remove internal padding so browser can handle print margins */
-                            padding: 0; 
-                            width: 100%;
-                            height: auto;
-                            /* Expand to fill the printable area, adjusting gap to fit */
-                            gap: 5px;
-                        }
-                        .card {
-                            /* Slight padding adjustment for actual print */
-                            padding: 8px;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <!-- Action Bar -->
-                <div class="print-action-bar">
-                    <h2>Preview Kartu Pemilih (${allVoters.length} Kartu)</h2>
-                    <button class="btn-print" onclick="window.print()">🖨️ Lanjutkan Cetak</button>
-                </div>
-            `;
-
-            const qrScripts = [];
-            const cardsPerPage = 16;
-            let pageCount = Math.ceil(allVoters.length / cardsPerPage);
-
-            // Create pages and cards
-            for (let i = 0; i < pageCount; i++) {
-                htmlContent += `<div class="page">`;
-                
-                for (let j = 0; j < cardsPerPage; j++) {
-                    const voterIndex = (i * cardsPerPage) + j;
-                    if (voterIndex < allVoters.length) {
-                        const v = allVoters[voterIndex];
-                        const qrDivId = "qrcode_" + voterIndex;
-                        
-                        htmlContent += `
-                            <div class="card">
-                                <div class="school-header">KARTU PEMILIH E-VOTING<br>SMAN 1 NGAWI</div>
-                                <div class="qr-container">
-                                    <div id="${qrDivId}" class="qr-box"></div>
-                                </div>
-                                <div class="voter-name">${v.name}</div>
-                                <div class="voter-nisn">${v.id}</div>
-                                <div class="voter-role">${v.role}</div>
-                            </div>
-                        `;
-
-                        // Reduce QR size slightly to fit 4x4 grid comfortably
-                        qrScripts.push(`
-                            new QRCode(document.getElementById("${qrDivId}"), {
-                                text: "${v.id}",
-                                width: 70,
-                                height: 70,
-                                colorDark : "#000000",
-                                colorLight : "#ffffff",
-                                correctLevel : QRCode.CorrectLevel.M
-                            });
-                        `);
-                    } else {
-                        // Empty placeholder to maintain grid structure if page is not full
-                        htmlContent += `<div style="visibility: hidden;"></div>`;
-                    }
-                }
-                
-                htmlContent += `</div>`; // Close .page
-            }
-
-            htmlContent += `
-                <script>
-                    window.onload = function() {
-                        // Generate all QR codes
-                        ${qrScripts.join('\n')}
-                        
-                        // We intentionally DO NOT call window.print() automatically here anymore.
-                        // The user will review the preview and click "Lanjutkan Cetak" manually.
-                    };
-                <\/script>
-            </body>
-            </html>
-            `;
-
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
+        document.getElementById('btn-export-csv').addEventListener('click', () => {
+            if (allVoters.length === 0) return alert("Belum ada data untuk diunduh!");
+            const csvRows = ["nisn,nama,role"];
+            allVoters.forEach(v => { csvRows.push(`${v.id},"${v.name}",${v.role}`); });
+            const blob = new Blob([csvRows.join("\n")], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "Database_Pemilih_EVoting.csv";
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
         });
 
-        // Event Delegation Tabel (Edit/Hapus)
         tableBody.addEventListener('click', async (e) => {
             const btnEdit = e.target.closest('.btn-edit');
             const btnDelete = e.target.closest('.btn-delete');
@@ -804,11 +672,8 @@
             if(btnEdit) {
                 const { id, name, role } = btnEdit.dataset;
                 switchTab('input');
-                manualId.value = id;
-                manualId.readOnly = true; 
-                manualId.classList.add('bg-slate-100', 'text-slate-500');
-                manualName.value = name;
-                manualRole.value = role;
+                manualId.value = id; manualId.readOnly = true; manualId.classList.add('bg-slate-100', 'text-slate-500');
+                manualName.value = name; manualRole.value = role;
                 document.getElementById('text-manual-submit').textContent = 'Update Data';
                 btnCancelEdit.classList.remove('hidden');
                 viewInput.scrollIntoView({ behavior: 'smooth' });
@@ -823,12 +688,89 @@
                         allVoters = allVoters.filter(v => v.id !== id);
                         renderTable(); 
                         alert(`Data ${name} terhapus.`);
-                    } catch(err) {
-                        alert("Gagal menghapus data.");
-                    }
+                    } catch(err) { alert("Gagal menghapus data."); }
                 }
             }
         });
+
+        // =====================================================================
+        // FITUR CETAK KARTU (GENERATOR PREVIEW & FUNGSI PRINT)
+        // =====================================================================
+        const pagesContainer = document.getElementById('print-pages-container');
+
+        function generatePrintPreview() {
+            pagesContainer.innerHTML = ""; // Bersihkan kontainer
+            
+            if(allVoters.length === 0) {
+                pagesContainer.innerHTML = `<div class="text-slate-400 italic py-10 no-print">Tidak ada data pemilih untuk dicetak.</div>`;
+                document.getElementById('print-total-voters').textContent = 0;
+                document.getElementById('print-total-pages').textContent = 0;
+                return;
+            }
+
+            const cardsPerPage = 16;
+            const pageCount = Math.ceil(allVoters.length / cardsPerPage);
+            
+            document.getElementById('print-total-voters').textContent = allVoters.length;
+            document.getElementById('print-total-pages').textContent = pageCount;
+
+            // Proses per halaman (Lembar A4)
+            for (let i = 0; i < pageCount; i++) {
+                // Buat Elemen Kertas A4
+                const pageElement = document.createElement('div');
+                pageElement.className = "a4-page";
+                
+                // Masukkan 16 Kartu ke dalam kertas A4
+                for (let j = 0; j < cardsPerPage; j++) {
+                    const voterIndex = (i * cardsPerPage) + j;
+                    
+                    if (voterIndex < allVoters.length) {
+                        const v = allVoters[voterIndex];
+                        const qrDivId = `qr-preview-${voterIndex}`;
+                        
+                        // Buat Elemen Kartu
+                        const cardHTML = `
+                            <div class="card-print">
+                                <div class="school-header-print">KARTU PEMILIH E-VOTING<br>SMAN 1 NGAWI</div>
+                                <div class="qr-container-print">
+                                    <div id="${qrDivId}" class="qr-box-print"></div>
+                                </div>
+                                <div class="voter-name-print">${v.name}</div>
+                                <div class="voter-nisn-print">${v.id}</div>
+                                <div class="voter-role-print">${v.role}</div>
+                            </div>
+                        `;
+                        pageElement.innerHTML += cardHTML;
+                    } else {
+                        // Kotak kosong agar grid tetap sejajar meskipun di baris terakhir kurang dari 4
+                        pageElement.innerHTML += `<div style="visibility: hidden;"></div>`;
+                    }
+                }
+                
+                // Masukkan Kertas A4 ke dalam Pratinjau
+                pagesContainer.appendChild(pageElement);
+            }
+
+            // Setelah seluruh elemen HTML di-render ke layar, baru eksekusi QR Code-nya
+            // (QRCodeJS butuh elemen ID untuk target gambarnya)
+            allVoters.forEach((v, index) => {
+                new QRCode(document.getElementById(`qr-preview-${index}`), {
+                    text: v.id, // NISN sebagai text barcode
+                    width: 70,  // Ukuran pas untuk Grid 4x4
+                    height: 70,
+                    colorDark : "#0f172a",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.M
+                });
+            });
+        }
+
+        // Eksekusi Panggilan Printer Asli Browser
+        document.getElementById('btn-execute-print').addEventListener('click', () => {
+            if(allVoters.length === 0) return alert("Belum ada data untuk dicetak!");
+            window.print();
+        });
+
     </script>
 </body>
 </html>
