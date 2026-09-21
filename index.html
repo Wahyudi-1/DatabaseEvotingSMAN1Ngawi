@@ -23,14 +23,14 @@
             padding: 1cm;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 10px;
+            grid-template-rows: repeat(5, 1fr); /* SEKARANG 5 BARIS (Total 20 Kartu) */
+            gap: 8px; /* Gap sedikit diperkecil agar muat 5 baris */
         }
         
         .card-print {
             border: 1.5px solid #64748b;
             border-radius: 8px;
-            padding: 10px;
+            padding: 8px; /* Padding sedikit diperkecil */
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -39,13 +39,13 @@
             overflow: hidden;
             page-break-inside: avoid;
         }
-        .school-header-print { font-size: 10px; font-weight: bold; color: #1e293b; border-bottom: 1.5px dashed #cbd5e1; padding-bottom: 6px; margin-bottom: 6px; line-height: 1.2; }
-        .qr-container-print { display: flex; justify-content: center; margin: 3px 0; }
-        .qr-box-print { padding: 4px; border: 1px solid #e2e8f0; border-radius: 4px; display: inline-block; background: white; }
-        .voter-name-print { font-size: 11px; font-weight: 900; color: #0f172a; text-transform: uppercase; margin-top: 4px; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .voter-nisn-print { font-size: 10px; color: #475569; margin-top: 2px; font-weight: bold; }
-        .voter-kelas-print { font-size: 10px; color: #334155; margin-top: 2px; font-weight: 700; }
-        .voter-role-print { font-size: 9px; font-weight: bold; margin-top: 4px; display: inline-block; padding: 2px 6px; border: 1px solid #334155; border-radius: 10px; text-transform: uppercase; }
+        .school-header-print { font-size: 9px; font-weight: bold; color: #1e293b; border-bottom: 1.5px dashed #cbd5e1; padding-bottom: 4px; margin-bottom: 4px; line-height: 1.2; }
+        .qr-container-print { display: flex; justify-content: center; margin: 2px 0; }
+        .qr-box-print { padding: 3px; border: 1px solid #e2e8f0; border-radius: 4px; display: inline-block; background: white; }
+        .voter-name-print { font-size: 10px; font-weight: 900; color: #0f172a; text-transform: uppercase; margin-top: 4px; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .voter-nisn-print { font-size: 9px; color: #475569; margin-top: 2px; font-weight: bold; }
+        .voter-kelas-print { font-size: 9px; color: #334155; margin-top: 2px; font-weight: 700; }
+        .voter-role-print { font-size: 8px; font-weight: bold; margin-top: 4px; display: inline-block; padding: 2px 6px; border: 1px solid #334155; border-radius: 10px; text-transform: uppercase; }
 
         @media print {
             body { background: white !important; padding: 0 !important; margin: 0 !important; }
@@ -65,7 +65,7 @@
                 page-break-after: always;
                 gap: 5px;
             }
-            .card-print { padding: 8px; }
+            .card-print { padding: 6px; } /* Diperkecil lagi saat proses cetak agar benar-benar masuk ukuran A4 */
         }
     </style>
 </head>
@@ -277,7 +277,7 @@
                 
                 <div class="flex justify-between items-center p-4 bg-white border-b border-slate-200 sticky top-0 z-10 no-print shadow-sm">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800"><i class="ph-fill ph-printer text-purple-600 mr-1"></i> Preview Kertas A4</h2>
+                        <h2 class="text-lg font-bold text-slate-800"><i class="ph-fill ph-printer text-purple-600 mr-1"></i> Preview Kertas A4 (20 Kartu/Lembar)</h2>
                         <p class="text-xs text-slate-500 mt-0.5">Memuat <span id="print-total-voters" class="font-bold text-slate-700">0</span> kartu dalam <span id="print-total-pages" class="font-bold text-slate-700">0</span> halaman.</p>
                     </div>
                     <button id="btn-execute-print" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg shadow-md transition-all flex items-center gap-2">
@@ -398,7 +398,7 @@
         tabPrint.addEventListener('click', () => switchTab('print'));
 
         // =====================================================================
-        // LOGIKA DOWNLOAD TEMPLATE & UPLOAD MASSAL (DENGAN KELAS)
+        // LOGIKA DOWNLOAD TEMPLATE & UPLOAD MASSAL
         // =====================================================================
         document.getElementById('btn-download-template').addEventListener('click', () => {
             const csvContent = "nisn,nama,kelas,role\n1234567890,BUDI SANTOSO,X-1,Siswa\n198001012005011001,PAK GURU S.PD,-,Guru\n9876543210,SITI AMINAH,XI-IPA-1,Siswa\nREKAP2026,PANITIA UTAMA,-,Panitia";
@@ -527,11 +527,9 @@
                         if (kelasA === "-" || kelasA === "") kelasA = "ZZZ";
                         if (kelasB === "-" || kelasB === "") kelasB = "ZZZ";
 
-                        // Gunakan numeric:true agar angka kelas berurut otomatis secara pintar (X-2 muncul sebelum X-10)
                         let cmpKelas = kelasA.localeCompare(kelasB, undefined, { numeric: true });
                         if (cmpKelas !== 0) return cmpKelas;
                         
-                        // Jika kelas sama persis, urutkan nama sesuai abjad
                         return (a.name || "").localeCompare(b.name || "");
                     });
 
@@ -616,7 +614,7 @@
         });
 
         // =====================================================================
-        // FITUR CETAK KARTU (GENERATOR PREVIEW & FUNGSI PRINT)
+        // FITUR CETAK KARTU (20 KARTU PER HALAMAN)
         // =====================================================================
         const pagesContainer = document.getElementById('print-pages-container');
 
@@ -629,7 +627,7 @@
                 return;
             }
 
-            const cardsPerPage = 16;
+            const cardsPerPage = 20; // SEKARANG 20 KARTU PER HALAMAN
             const pageCount = Math.ceil(allVoters.length / cardsPerPage);
             
             document.getElementById('print-total-voters').textContent = allVoters.length;
@@ -666,11 +664,12 @@
                 pagesContainer.appendChild(pageElement);
             }
 
+            // QR Code size slightly reduced to fit 20 cards
             allVoters.forEach((v, index) => {
                 new QRCode(document.getElementById(`qr-preview-${index}`), {
                     text: v.id,
-                    width: 65,  
-                    height: 65,
+                    width: 58,  
+                    height: 58,
                     colorDark : "#0f172a",
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.M
