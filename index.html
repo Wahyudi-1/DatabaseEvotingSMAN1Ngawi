@@ -186,7 +186,7 @@
                         <p class="text-slate-500 text-xs mt-1">Total data: <span id="total-voters-text" class="font-bold text-blue-600">0</span> orang</p>
                     </div>
                     
-                    <!-- Filter Pencarian & Export CSV -->
+                    <!-- Filter Pencarian & Cetak Kartu -->
                     <div class="flex flex-col sm:flex-row gap-2">
                         <div class="relative">
                             <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
@@ -199,9 +199,9 @@
                         <button id="btn-refresh-data" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all flex items-center justify-center gap-2" title="Refresh Tabel">
                             <i class="ph-bold ph-arrows-clockwise"></i>
                         </button>
-                        <!-- TOMBOL EXPORT CSV -->
-                        <button id="btn-export-csv" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
-                            <i class="ph-bold ph-download-simple"></i> Export CSV
+                        <!-- TOMBOL CETAK KARTU BER-QR CODE -->
+                        <button id="btn-print-cards" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-printer"></i> Cetak Kartu
                         </button>
                     </div>
                 </div>
@@ -228,7 +228,7 @@
                         </tbody>
                     </table>
                 </div>
-                <p class="text-xs text-slate-400 mt-3 text-center">*Menampilkan maksimal 100 hasil pencarian teratas agar sistem tetap ringan.</p>
+                <p class="text-xs text-slate-400 mt-3 text-center">*Menampilkan maksimal 100 hasil pencarian teratas agar sistem tetap ringan. Namun fungsi Cetak Kartu akan mencetak SELURUH data.</p>
             </div>
 
         </div>
@@ -254,7 +254,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = 'osis-sman1ngawi-app'; // Prefix database dari kode asli Anda
+        const appId = 'osis-sman1ngawi-app'; 
 
         let allVoters = [];
 
@@ -268,32 +268,27 @@
         const btnLoginSubmit = document.getElementById('btn-login-submit');
         const loginError = document.getElementById('login-error');
 
-        // Memantau Status Login Admin
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Berhasil Login -> Sembunyikan Panel Login, Tampilkan Panel Admin
                 loginView.classList.add('hidden');
                 appView.classList.remove('hidden');
                 appView.classList.add('flex');
                 
                 adminEmailDisplay.textContent = user.email;
                 
-                // Jika sedang di Tab Database, otomatis Fetch Data
                 if(document.getElementById('view-database').classList.contains('flex')) {
                     fetchVoters();
                 }
             } else {
-                // Belum Login / Log Out -> Tampilkan Panel Login, Sembunyikan App
                 loginView.classList.remove('hidden');
                 appView.classList.add('hidden');
                 appView.classList.remove('flex');
                 
-                allVoters = []; // Bersihkan cache data di background untuk keamanan
+                allVoters = []; 
                 document.getElementById('table-body').innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500">Menunggu proses login...</td></tr>`;
             }
         });
 
-        // Event Submit Form Login
         formLogin.addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
@@ -317,14 +312,11 @@
                 });
         });
 
-        // Event Logout
         document.getElementById('btn-logout').addEventListener('click', () => {
-            const konfirmasi = confirm("Apakah Anda yakin ingin keluar dari Panel Admin?");
-            if (konfirmasi) {
+            if (confirm("Apakah Anda yakin ingin keluar dari Panel Admin?")) {
                 signOut(auth).catch(err => alert("Gagal keluar: " + err.message));
             }
         });
-
 
         // =====================================================================
         // MANAJEMEN TAB NAVIGASI
@@ -352,13 +344,11 @@
                 tabDatabase.className = "flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2";
                 tabInput.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
                 
-                // Pastikan Auth sudah aktif sebelum memanggil Firestore
                 if(auth.currentUser && allVoters.length === 0) fetchVoters(); 
             }
         }
         tabInput.addEventListener('click', () => switchTab('input'));
         tabDatabase.addEventListener('click', () => switchTab('database'));
-
 
         // =====================================================================
         // LOGIKA DOWNLOAD TEMPLATE & UPLOAD MASSAL
@@ -433,7 +423,7 @@
                     alert(`Upload Massal Selesai!\nBerhasil: ${successCount} dari ${total} baris.`);
                     resetBulkUI(true);
                     
-                    allVoters = []; // Reset cache agar mengambil ulang jika ke tab Database
+                    allVoters = []; 
                 },
                 error: function(err) {
                     alert("Gagal membaca file: " + err.message);
@@ -478,7 +468,7 @@
                 manualAlert.innerHTML = `<i class="ph-fill ph-check-circle mr-1"></i> Data <strong>${nama}</strong> (${nisn}) berhasil disimpan!`;
                 
                 resetManualForm();
-                allVoters = []; // Paksa fetch ulang jika pindah tab
+                allVoters = []; 
 
             } catch (error) {
                 console.error(error);
@@ -502,7 +492,7 @@
         btnCancelEdit.addEventListener('click', resetManualForm);
 
         // =====================================================================
-        // LOGIKA DATABASE & TABEL (Termasuk Export CSV)
+        // LOGIKA DATABASE & TABEL
         // =====================================================================
         const tableBody = document.getElementById('table-body');
         const filterNisn = document.getElementById('filter-nisn');
@@ -512,7 +502,6 @@
             tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Memuat data dari server...</td></tr>`;
             
             try {
-                // JALUR DATABASE ASLI SESUAI KODE LAMA ANDA
                 const votersCol = collection(db, 'artifacts', appId, 'public', 'data', 'voters_list');
                 const snapshot = await getDocs(votersCol);
                 
@@ -570,28 +559,177 @@
             `).join('');
         }
 
-        // Listener Filter & Refresh
         filterNisn.addEventListener('input', renderTable);
         filterName.addEventListener('input', renderTable);
         document.getElementById('btn-refresh-data').addEventListener('click', fetchVoters);
 
-        // FITUR EXPORT CSV
-        document.getElementById('btn-export-csv').addEventListener('click', () => {
-            if (allVoters.length === 0) return alert("Belum ada data untuk diunduh!");
+        // =====================================================================
+        // FITUR CETAK KARTU PEMILIH BER-QR CODE
+        // =====================================================================
+        document.getElementById('btn-print-cards').addEventListener('click', () => {
+            if (allVoters.length === 0) {
+                return alert("Belum ada data untuk dicetak!");
+            }
             
-            const csvRows = ["nisn,nama,role"]; // Header
-            allVoters.forEach(v => {
-                csvRows.push(`${v.id},"${v.name}",${v.role}`);
+            // Konfirmasi jika jumlah data sangat banyak (agar browser tidak ngelag)
+            if (allVoters.length > 500) {
+                const lanjut = confirm(`Peringatan: Anda akan mencetak ${allVoters.length} kartu sekaligus. Proses ini mungkin memakan waktu agak lama. Lanjutkan?`);
+                if(!lanjut) return;
+            }
+
+            // Membuka Tab Baru untuk mencetak
+            const printWindow = window.open('', '_blank');
+            
+            // Menulis HTML dasar dan styling kertas A4
+            let htmlContent = `
+            <!DOCTYPE html>
+            <html lang="id">
+            <head>
+                <meta charset="UTF-8">
+                <title>Cetak Kartu Pemilih E-Voting</title>
+                <!-- Library QR Code Generator Client-Side -->
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <style>
+                    * { box-sizing: border-box; }
+                    body { 
+                        font-family: 'Arial', sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        background: #f0f0f0; 
+                    }
+                    /* Layout Grid 3 Kolom untuk menghemat kertas A4 */
+                    .grid-container { 
+                        display: grid; 
+                        grid-template-columns: repeat(3, 1fr); 
+                        gap: 15px; 
+                        max-width: 21cm; /* Lebar A4 */
+                        margin: 0 auto;
+                        background: white;
+                        padding: 1cm;
+                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                    }
+                    .card { 
+                        border: 2px solid #334155; 
+                        border-radius: 10px; 
+                        padding: 15px; 
+                        text-align: center; 
+                        page-break-inside: avoid; 
+                        background: #ffffff;
+                    }
+                    .school-header { 
+                        font-size: 13px; 
+                        font-weight: bold; 
+                        color: #1e293b;
+                        border-bottom: 2px dashed #cbd5e1; 
+                        padding-bottom: 8px; 
+                        margin-bottom: 12px; 
+                    }
+                    .qr-container { 
+                        display: flex; 
+                        justify-content: center; 
+                        margin: 15px 0; 
+                    }
+                    /* Container pembungkus QR Code */
+                    .qr-box {
+                        padding: 5px;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 5px;
+                    }
+                    .voter-name { 
+                        font-size: 16px; 
+                        font-weight: 900; 
+                        color: #0f172a;
+                        text-transform: uppercase; 
+                        margin-top: 5px; 
+                        line-height: 1.2;
+                    }
+                    .voter-nisn { 
+                        font-size: 14px; 
+                        color: #475569;
+                        margin-top: 5px; 
+                        font-weight: bold;
+                    }
+                    .voter-role { 
+                        font-size: 11px; 
+                        font-weight: bold; 
+                        margin-top: 8px; 
+                        display: inline-block; 
+                        padding: 3px 10px; 
+                        border: 1px solid #334155; 
+                        border-radius: 20px; 
+                        text-transform: uppercase;
+                    }
+                    
+                    /* Aturan khusus saat ditekan Ctrl+P (Print) */
+                    @media print {
+                        body { background: none; padding: 0; }
+                        .grid-container { 
+                            box-shadow: none; 
+                            padding: 0; 
+                            gap: 10px;
+                            width: 100%;
+                            max-width: none;
+                        }
+                        @page { margin: 1cm; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="grid-container">
+            `;
+
+            const qrScripts = []; // Menampung script eksekusi QR Code
+
+            // Looping seluruh data pemilih (tanpa filter/limit)
+            allVoters.forEach((v, index) => {
+                const qrDivId = "qrcode_" + index; // ID Unik untuk setiap QR Code
+                
+                htmlContent += `
+                    <div class="card">
+                        <div class="school-header">KARTU PEMILIH E-VOTING<br>SMAN 1 NGAWI</div>
+                        <div class="qr-container">
+                            <div id="${qrDivId}" class="qr-box"></div>
+                        </div>
+                        <div class="voter-name">${v.name}</div>
+                        <div class="voter-nisn">${v.id}</div>
+                        <div class="voter-role">${v.role}</div>
+                    </div>
+                `;
+
+                // Menyimpan perintah pembuat QR Code ke dalam array
+                qrScripts.push(`
+                    new QRCode(document.getElementById("${qrDivId}"), {
+                        text: "${v.id}",
+                        width: 110,
+                        height: 110,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.M
+                    });
+                `);
             });
-            
-            const blob = new Blob([csvRows.join("\n")], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "Database_Pemilih_EVoting.csv";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+
+            htmlContent += `
+                </div>
+                <script>
+                    window.onload = function() {
+                        // 1. Eksekusi pembuatan seluruh QR Code secara instan
+                        ${qrScripts.join('\n')}
+                        
+                        // 2. Beri jeda 1.5 detik agar gambar QR Code selesai dirender
+                        // Lalu buka otomatis dialog Print (Ctrl+P)
+                        setTimeout(function() {
+                            window.print();
+                        }, 1500);
+                    };
+                <\/script>
+            </body>
+            </html>
+            `;
+
+            // Render isi HTML ke jendela baru
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
         });
 
         // Event Delegation Tabel (Edit/Hapus)
