@@ -504,7 +504,7 @@
         btnCancelEdit.addEventListener('click', resetManualForm);
 
         // =====================================================================
-        // LOGIKA MENGAMBIL DATA (DATABASE & TABEL)
+        // LOGIKA MENGAMBIL DATA (DATABASE & TABEL) DENGAN SMART SORTING
         // =====================================================================
         const tableBody = document.getElementById('table-body');
         const filterNisn = document.getElementById('filter-nisn');
@@ -518,10 +518,20 @@
                     allVoters = [];
                     snapshot.forEach((doc) => { allVoters.push({ id: doc.id, ...doc.data() }); });
                     
-                    // Sort by Kelas (Alphabetical) then Name
+                    // --- ALGORITMA PENGURUTAN (NATURAL SORT) ---
                     allVoters.sort((a, b) => {
-                        let kelasA = (a.kelas || "").toUpperCase(); let kelasB = (b.kelas || "").toUpperCase();
-                        if(kelasA < kelasB) return -1; if(kelasA > kelasB) return 1;
+                        let kelasA = (a.kelas || "").trim().toUpperCase();
+                        let kelasB = (b.kelas || "").trim().toUpperCase();
+                        
+                        // Pindahkan role non-siswa (kelas kosong atau '-') ke urutan paling belakang (Z)
+                        if (kelasA === "-" || kelasA === "") kelasA = "ZZZ";
+                        if (kelasB === "-" || kelasB === "") kelasB = "ZZZ";
+
+                        // Gunakan numeric:true agar angka kelas berurut otomatis secara pintar (X-2 muncul sebelum X-10)
+                        let cmpKelas = kelasA.localeCompare(kelasB, undefined, { numeric: true });
+                        if (cmpKelas !== 0) return cmpKelas;
+                        
+                        // Jika kelas sama persis, urutkan nama sesuai abjad
                         return (a.name || "").localeCompare(b.name || "");
                     });
 
@@ -644,7 +654,7 @@
                                 </div>
                                 <div class="voter-name-print">${v.name}</div>
                                 <div class="voter-nisn-print">${v.id}</div>
-                                <div class="voter-kelas-print">${v.kelas && v.kelas !== '-' ? 'Kelas: ' + v.kelas : ''}</div>
+                                <div class="voter-kelas-print">${v.kelas && v.kelas !== '-' && v.kelas !== 'ZZZ' ? 'Kelas: ' + v.kelas : ''}</div>
                                 <div class="voter-role-print">${v.role}</div>
                             </div>
                         `;
