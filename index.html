@@ -7,84 +7,86 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
-    </style>
 </head>
-<body class="bg-slate-100 min-h-screen flex flex-col items-center p-4 md:p-6 font-sans">
+<body class="bg-slate-100 min-h-screen relative font-sans">
 
     <!-- ========================================== -->
-    <!-- VIEW 0: LOGIN SCREEN (FIREBASE AUTH) -->
+    <!-- VIEW: HALAMAN LOGIN -->
     <!-- ========================================== -->
-    <div id="view-login" class="flex w-full max-w-sm flex-col items-center justify-center min-h-[70vh]">
-        <div class="bg-white rounded-2xl shadow-xl w-full border border-slate-200 overflow-hidden animate-fade-in">
-            <div class="bg-blue-600 p-6 text-center relative">
-                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                    <i class="ph-fill ph-shield-check text-4xl text-blue-600"></i>
-                </div>
-                <h2 class="text-xl font-bold text-white">Login Admin</h2>
-                <p class="text-blue-100 text-xs mt-1">E-Voting SMAN 1 Ngawi</p>
+    <div id="login-view" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-100 min-h-screen p-4">
+        <div class="w-full max-w-md text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4 shadow-sm border border-blue-200">
+                <i class="ph-fill ph-shield-check text-4xl"></i>
             </div>
-            <div class="p-6">
-                <form id="form-login" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Email Admin</label>
-                        <input type="email" id="login-email" required class="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="admin@sman1ngawi.sch.id">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
-                        <input type="password" id="login-password" required class="w-full p-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="••••••••">
-                    </div>
-                    <button type="submit" id="btn-login" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all flex justify-center items-center gap-2 mt-2">
-                        <i class="ph-bold ph-sign-in text-lg"></i> <span id="login-text">Masuk Sistem</span>
-                    </button>
-                </form>
-                <div class="mt-4 p-3 bg-slate-50 rounded-lg text-[10px] text-slate-500 border border-slate-100 text-center">
-                    <i class="ph-fill ph-lock-key mr-1"></i> Akses diamankan dengan enkripsi Firebase Authentication.
-                </div>
-            </div>
+            <h2 class="text-2xl font-extrabold text-slate-800">Panel Admin Pemilih</h2>
+            <p class="mt-2 text-sm text-slate-500">Sistem E-Voting OSIS SMAN 1 Ngawi</p>
         </div>
+
+        <div class="w-full max-w-md bg-white py-8 px-6 shadow-xl rounded-2xl border border-slate-200">
+            <form id="form-login" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Admin</label>
+                    <input id="login-email" type="email" required placeholder="admin@email.com" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Password</label>
+                    <input id="login-password" type="password" required placeholder="••••••••" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                </div>
+                
+                <div id="login-error" class="hidden text-center text-xs font-bold text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200">
+                    Gagal login! Periksa kembali email dan password.
+                </div>
+
+                <button type="submit" id="btn-login-submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all gap-2 items-center">
+                    <i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem
+                </button>
+            </form>
+        </div>
+        <p class="text-xs text-slate-400 mt-6 text-center max-w-sm">
+            Gunakan akun yang telah didaftarkan melalui Firebase Authentication.
+        </p>
     </div>
 
     <!-- ========================================== -->
-    <!-- DASHBOARD ADMIN (Aman: Disembunyikan sebelum Auth) -->
+    <!-- VIEW: APLIKASI UTAMA (DASHBOARD) -->
     <!-- ========================================== -->
-    <div id="view-dashboard" class="hidden w-full flex-col items-center">
-
-        <div class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center mb-6 mt-4 md:mt-0 gap-4">
-            <div class="text-center md:text-left">
+    <div id="app-view" class="hidden flex-col items-center w-full p-4 md:p-6 min-h-screen">
+        <!-- Header Panel -->
+        <div class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
                 <h1 class="text-2xl font-extrabold text-slate-800">Panel Admin Pemilih</h1>
                 <p class="text-slate-500 text-sm">Sistem E-Voting OSIS SMAN 1 Ngawi</p>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="hidden md:block text-right">
-                    <p class="text-xs text-slate-500">Login sebagai:</p>
-                    <p id="admin-email-display" class="text-sm font-bold text-slate-800">admin@email.com</p>
+            
+            <!-- Info User & Tombol Keluar -->
+            <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 w-full md:w-auto justify-between md:justify-end">
+                <div class="text-right hidden sm:block">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Login sebagai</p>
+                    <p id="admin-email-display" class="text-sm font-bold text-slate-700">admin@email.com</p>
                 </div>
-                <button id="btn-logout" class="px-4 py-2 bg-white border border-slate-200 text-red-600 hover:bg-red-50 hover:border-red-200 font-bold rounded-lg shadow-sm transition-all flex items-center gap-2 text-sm">
+                <button id="btn-logout" class="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg font-bold transition-all border border-transparent hover:border-red-100">
                     <i class="ph-bold ph-sign-out text-lg"></i> Keluar
                 </button>
             </div>
         </div>
 
+        <!-- Main Card -->
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-5xl border border-slate-200 overflow-hidden flex flex-col relative">
             
+            <!-- Tab Navigasi -->
             <div class="flex border-b border-slate-200 bg-slate-50">
-                <button id="tab-input" class="flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2 text-sm md:text-base">
+                <button id="tab-input" class="flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2">
                     <i class="ph-bold ph-plus-circle text-lg"></i> Input Data
                 </button>
-                <button id="tab-database" class="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2 text-sm md:text-base">
+                <button id="tab-database" class="flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2">
                     <i class="ph-bold ph-database text-lg"></i> Database Pemilih
                 </button>
             </div>
 
+            <!-- VIEW 1: INPUT DATA -->
             <div id="view-input" class="flex flex-col md:flex-row w-full">
-                <!-- UPLOAD MASSAL -->
-                <div class="p-6 md:p-8 md:w-1/2 bg-white border-b md:border-b-0 md:border-r border-slate-100">
+                <!-- BAGIAN KIRI: UPLOAD MASSAL (CSV) -->
+                <div class="p-8 md:w-1/2 bg-white border-b md:border-b-0 md:border-r border-slate-100">
                     <div class="mb-6 flex items-center gap-3">
                         <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
                             <i class="ph-fill ph-file-csv text-2xl"></i>
@@ -98,22 +100,25 @@
                     <div class="bg-blue-50 p-4 rounded-xl mb-6 text-xs text-blue-800 border border-blue-100">
                         <strong>Format Header CSV (Baris 1):</strong><br>
                         <code class="font-bold bg-blue-100 px-1 py-0.5 rounded">nisn, nama, role</code>
+                        
                         <div class="mt-3 pt-3 border-t border-blue-200">
                             <button id="btn-download-template" class="flex items-center gap-1.5 text-blue-700 font-bold hover:text-blue-900 transition-colors bg-white px-3 py-1.5 rounded-lg border border-blue-200 shadow-sm hover:bg-blue-100 w-full justify-center sm:w-auto">
-                                <i class="ph-bold ph-download-simple text-base"></i> Template CSV
+                                <i class="ph-bold ph-download-simple text-base"></i> Download Contoh Template CSV
                             </button>
                         </div>
                     </div>
 
                     <input type="file" id="csv-file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all mb-6 cursor-pointer border border-slate-200 rounded-xl p-2 bg-slate-50">
 
-                    <button id="btn-upload" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all disabled:opacity-50 flex justify-center items-center gap-2">
-                        <i class="ph-bold ph-upload-simple text-lg"></i> Mulai Upload Massal
+                    <button id="btn-upload" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+                        <i class="ph-bold ph-upload-simple text-lg"></i>
+                        Mulai Upload Massal
                     </button>
 
+                    <!-- Area Status Upload Massal -->
                     <div id="status-area" class="mt-6 hidden">
                         <div class="flex justify-between text-xs font-bold text-slate-700 mb-2">
-                            <span>Proses ke Database:</span>
+                            <span>Proses Upload:</span>
                             <span id="progress-text">0 / 0</span>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
@@ -123,69 +128,85 @@
                     </div>
                 </div>
 
-                <!-- TAMBAH MANUAL -->
-                <div class="p-6 md:p-8 md:w-1/2 bg-slate-50">
+                <!-- BAGIAN KANAN: TAMBAH / EDIT MANUAL -->
+                <div class="p-8 md:w-1/2 bg-slate-50">
                     <div class="mb-6 flex items-center gap-3">
                         <div class="p-3 bg-green-100 text-green-600 rounded-xl">
                             <i class="ph-fill ph-user-plus text-2xl"></i>
                         </div>
                         <div>
                             <h2 class="text-xl font-bold text-slate-800">Tambah / Edit Manual</h2>
-                            <p class="text-slate-500 text-xs mt-1">Gunakan untuk data susulan / revisi.</p>
+                            <p class="text-slate-500 text-xs mt-1">Gunakan untuk data susulan atau perbaikan nama.</p>
                         </div>
                     </div>
 
                     <form id="form-manual" class="space-y-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">NISN / NIP (ID Pemilih)</label>
-                            <input type="text" id="manual-id" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-medium">
+                            <input type="text" id="manual-id" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-medium" placeholder="Contoh: 1234567890">
+                            <p class="text-[10px] text-slate-400 mt-1">*Jika NISN sudah ada, sistem otomatis mengubah datanya.</p>
                         </div>
+                        
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
-                            <input type="text" id="manual-name" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none uppercase font-medium">
+                            <input type="text" id="manual-name" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none uppercase font-medium" placeholder="Masukkan nama...">
                         </div>
+
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Sebagai (Role)</label>
                             <select id="manual-role" class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-medium">
                                 <option value="Siswa">Siswa</option>
                                 <option value="Guru">Guru / Staf</option>
-                                <option value="Panitia">Panitia</option>
+                                <option value="Panitia">Panitia (Akses Dasbor)</option>
                             </select>
                         </div>
+
                         <div class="pt-2 flex gap-2">
                             <button type="submit" id="btn-manual-submit" class="flex-1 py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-md transition-all flex justify-center items-center gap-2">
-                                <i class="ph-bold ph-floppy-disk text-lg"></i> <span id="text-manual-submit">Simpan</span>
+                                <i class="ph-bold ph-floppy-disk text-lg"></i>
+                                <span id="text-manual-submit">Simpan Data</span>
                             </button>
-                            <button type="button" id="btn-cancel-edit" class="hidden py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all">Batal</button>
+                            <button type="button" id="btn-cancel-edit" class="hidden py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all">
+                                Batal
+                            </button>
                         </div>
                     </form>
-                    <div id="manual-alert" class="mt-4 hidden p-3 rounded-lg text-xs font-bold text-center transition-all"></div>
+
+                    <div id="manual-alert" class="mt-4 hidden p-3 rounded-lg text-xs font-bold text-center transition-all">
+                        Pesan Notifikasi
+                    </div>
                 </div>
             </div>
 
-            <div id="view-database" class="hidden flex-col w-full p-6 md:p-8 bg-white min-h-[500px]">
-                <div class="flex flex-col lg:flex-row justify-between lg:items-center mb-6 gap-4">
+            <!-- VIEW 2: DATABASE PEMILIH -->
+            <div id="view-database" class="hidden flex-col w-full p-8 bg-white min-h-[500px]">
+                <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800">Daftar Pemilih Terdaftar</h2>
                         <p class="text-slate-500 text-xs mt-1">Total data: <span id="total-voters-text" class="font-bold text-blue-600">0</span> orang</p>
                     </div>
                     
-                    <div class="flex flex-col sm:flex-row gap-2 flex-wrap">
-                        <div class="relative flex-1 sm:flex-none">
+                    <!-- Filter Pencarian & Export CSV -->
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <div class="relative">
                             <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
-                            <input type="text" id="filter-nisn" placeholder="Cari NISN..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg outline-none w-full sm:w-32">
+                            <input type="text" id="filter-nisn" placeholder="Cari NISN..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-40">
                         </div>
-                        <div class="relative flex-1 sm:flex-none">
+                        <div class="relative">
                             <i class="ph ph-text-aa absolute left-3 top-2.5 text-slate-400"></i>
-                            <input type="text" id="filter-name" placeholder="Cari Nama..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg outline-none uppercase w-full sm:w-48">
+                            <input type="text" id="filter-name" placeholder="Cari Nama..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase w-full sm:w-56">
                         </div>
-                        <div class="flex gap-2 w-full sm:w-auto">
-                            <button id="btn-refresh-data" class="flex-1 sm:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg flex items-center justify-center gap-2" title="Refresh"><i class="ph-bold ph-arrows-clockwise"></i></button>
-                            <button id="btn-export-data" class="flex-1 sm:flex-none px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg flex items-center justify-center gap-2"><i class="ph-bold ph-download-simple"></i> Export CSV</button>
-                        </div>
+                        <button id="btn-refresh-data" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all flex items-center justify-center gap-2" title="Refresh Tabel">
+                            <i class="ph-bold ph-arrows-clockwise"></i>
+                        </button>
+                        <!-- TOMBOL EXPORT CSV -->
+                        <button id="btn-export-csv" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+                            <i class="ph-bold ph-download-simple"></i> Export CSV
+                        </button>
                     </div>
                 </div>
 
+                <!-- Tabel Data -->
                 <div class="w-full overflow-x-auto border border-slate-200 rounded-xl">
                     <table class="w-full text-sm text-left whitespace-nowrap">
                         <thead class="text-xs text-slate-500 bg-slate-50 uppercase font-bold">
@@ -193,50 +214,35 @@
                                 <th scope="col" class="px-6 py-4">No</th>
                                 <th scope="col" class="px-6 py-4">NISN / NIP</th>
                                 <th scope="col" class="px-6 py-4">Nama Lengkap</th>
-                                <th scope="col" class="px-6 py-4">Role</th>
+                                <th scope="col" class="px-6 py-4">Status / Role</th>
                                 <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="table-body" class="divide-y divide-slate-100">
-                            <tr><td colspan="5" class="px-6 py-10 text-center text-slate-500">Tabel Kosong</td></tr>
+                            <!-- Data akan dirender di sini via JS -->
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-slate-500">
+                                    Menunggu proses login...
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
+                <p class="text-xs text-slate-400 mt-3 text-center">*Menampilkan maksimal 100 hasil pencarian teratas agar sistem tetap ringan.</p>
             </div>
 
         </div>
     </div>
 
-    <!-- MODALS KUSTOM (Pengganti alert bawaan browser agar aman di github pages/iframe) -->
-    <div id="custom-alert" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-fade-in border border-slate-100">
-            <div class="flex items-center gap-3 mb-3 text-blue-600">
-                <i class="ph-fill ph-info text-2xl"></i><h3 id="alert-title" class="text-lg font-bold text-slate-800">Info</h3>
-            </div>
-            <p id="alert-message" class="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed mb-6"></p>
-            <button id="btn-alert-close" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all">Mengerti</button>
-        </div>
-    </div>
-
-    <div id="custom-confirm" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-fade-in border border-slate-100">
-            <div class="flex items-center gap-3 mb-3 text-red-600">
-                <i class="ph-fill ph-warning-circle text-2xl"></i><h3 id="confirm-title" class="text-lg font-bold text-slate-800">Peringatan</h3>
-            </div>
-            <p id="confirm-message" class="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed mb-6"></p>
-            <div class="flex gap-3">
-                <button id="btn-confirm-cancel" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all">Batal</button>
-                <button id="btn-confirm-ok" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all">Ya, Eksekusi</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- SCRIPT UTAMA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase (Dari project Anda)
+        // =====================================================================
+        // KONFIGURASI FIREBASE
+        // =====================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCzeg9t7CjeoxNB9DaNK10NsHixk0LC9UA",
             authDomain: "e-voting-6f923.firebaseapp.com",
@@ -245,92 +251,84 @@
             messagingSenderId: "626153070106",
             appId: "1:626153070106:web:309766b2c60f3a01a9fba3"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        // Root Koleksi untuk data produksi
-        const COLLECTION_NAME = "voters_database"; 
+        const appId = 'osis-sman1ngawi-app'; // Prefix database dari kode asli Anda
 
-        // --- MANAJEMEN MODAL KUSTOM ---
-        const elAlert = document.getElementById('custom-alert');
-        const elConfirm = document.getElementById('custom-confirm');
-        let confirmCallback = null;
+        let allVoters = [];
 
-        function showAlert(title, message) {
-            document.getElementById('alert-title').textContent = title;
-            document.getElementById('alert-message').textContent = message;
-            elAlert.classList.remove('hidden'); elAlert.classList.add('flex');
-        }
-        document.getElementById('btn-alert-close').addEventListener('click', () => { elAlert.classList.add('hidden'); elAlert.classList.remove('flex'); });
-
-        function showConfirm(title, message, onConfirm) {
-            document.getElementById('confirm-title').textContent = title;
-            document.getElementById('confirm-message').textContent = message;
-            confirmCallback = onConfirm;
-            elConfirm.classList.remove('hidden'); elConfirm.classList.add('flex');
-        }
-        document.getElementById('btn-confirm-cancel').addEventListener('click', () => { elConfirm.classList.add('hidden'); elConfirm.classList.remove('flex'); confirmCallback = null; });
-        document.getElementById('btn-confirm-ok').addEventListener('click', () => { elConfirm.classList.add('hidden'); elConfirm.classList.remove('flex'); if(confirmCallback) confirmCallback(); });
-
-        // --- LOGIKA LOGIN FIREBASE ---
-        const viewLogin = document.getElementById('view-login');
-        const viewDashboard = document.getElementById('view-dashboard');
+        // =====================================================================
+        // LOGIKA AUTENTIKASI (LOGIN & LOGOUT)
+        // =====================================================================
+        const loginView = document.getElementById('login-view');
+        const appView = document.getElementById('app-view');
+        const adminEmailDisplay = document.getElementById('admin-email-display');
         const formLogin = document.getElementById('form-login');
-        const btnLogin = document.getElementById('btn-login');
-        const loginText = document.getElementById('login-text');
+        const btnLoginSubmit = document.getElementById('btn-login-submit');
+        const loginError = document.getElementById('login-error');
 
-        // Pantau status login pengguna secara Realtime
+        // Memantau Status Login Admin
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Berhasil Login
-                document.getElementById('admin-email-display').textContent = user.email;
-                viewLogin.classList.add('hidden'); viewLogin.classList.remove('flex');
-                viewDashboard.classList.remove('hidden'); viewDashboard.classList.add('flex');
+                // Berhasil Login -> Sembunyikan Panel Login, Tampilkan Panel Admin
+                loginView.classList.add('hidden');
+                appView.classList.remove('hidden');
+                appView.classList.add('flex');
                 
-                // Ambil data database otomatis saat login sukses
-                fetchVoters();
+                adminEmailDisplay.textContent = user.email;
+                
+                // Jika sedang di Tab Database, otomatis Fetch Data
+                if(document.getElementById('view-database').classList.contains('flex')) {
+                    fetchVoters();
+                }
             } else {
-                // Belum Login / Terlogout
-                viewDashboard.classList.add('hidden'); viewDashboard.classList.remove('flex');
-                viewLogin.classList.remove('hidden'); viewLogin.classList.add('flex');
+                // Belum Login / Log Out -> Tampilkan Panel Login, Sembunyikan App
+                loginView.classList.remove('hidden');
+                appView.classList.add('hidden');
+                appView.classList.remove('flex');
+                
+                allVoters = []; // Bersihkan cache data di background untuk keamanan
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500">Menunggu proses login...</td></tr>`;
             }
         });
 
-        // Proses submit form login
-        formLogin.addEventListener('submit', async (e) => {
+        // Event Submit Form Login
+        formLogin.addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
+            const pass = document.getElementById('login-password').value;
+            
+            btnLoginSubmit.disabled = true;
+            btnLoginSubmit.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>`;
+            loginError.classList.add('hidden');
+            
+            signInWithEmailAndPassword(auth, email, pass)
+                .then(() => {
+                    btnLoginSubmit.disabled = false;
+                    btnLoginSubmit.innerHTML = `<i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem`;
+                    formLogin.reset();
+                })
+                .catch((error) => {
+                    btnLoginSubmit.disabled = false;
+                    btnLoginSubmit.innerHTML = `<i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem`;
+                    loginError.classList.remove('hidden');
+                    console.error("Gagal Login:", error);
+                });
+        });
 
-            btnLogin.disabled = true;
-            loginText.textContent = "Memverifikasi...";
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                formLogin.reset();
-            } catch (error) {
-                console.error(error);
-                let msg = "Terjadi kesalahan.";
-                if(error.code === 'auth/invalid-credential') msg = "Email atau Password Admin salah!";
-                else if(error.code === 'auth/too-many-requests') msg = "Terlalu banyak percobaan. Coba lagi nanti.";
-                showAlert("Login Gagal", msg);
-            } finally {
-                btnLogin.disabled = false;
-                loginText.textContent = "Masuk Sistem";
+        // Event Logout
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            const konfirmasi = confirm("Apakah Anda yakin ingin keluar dari Panel Admin?");
+            if (konfirmasi) {
+                signOut(auth).catch(err => alert("Gagal keluar: " + err.message));
             }
         });
 
-        // Proses Logout
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            showConfirm("Keluar Akun", "Anda yakin ingin keluar dari panel admin?", async () => {
-                try { await signOut(auth); } 
-                catch (error) { showAlert("Error", "Gagal melakukan logout."); }
-            });
-        });
 
-        // --- MANAJEMEN TAB NAVIGASI ---
+        // =====================================================================
+        // MANAJEMEN TAB NAVIGASI
+        // =====================================================================
         const tabInput = document.getElementById('tab-input');
         const tabDatabase = document.getElementById('tab-database');
         const viewInput = document.getElementById('view-input');
@@ -338,56 +336,76 @@
 
         function switchTab(tabName) {
             if(tabName === 'input') {
-                viewInput.classList.remove('hidden'); viewInput.classList.add('flex');
-                viewDatabase.classList.add('hidden'); viewDatabase.classList.remove('flex');
+                viewInput.classList.remove('hidden');
+                viewInput.classList.add('flex');
+                viewDatabase.classList.add('hidden');
+                viewDatabase.classList.remove('flex');
+                
                 tabInput.className = "flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2";
-                tabDatabase.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
+                tabDatabase.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
             } else {
-                viewInput.classList.add('hidden'); viewInput.classList.remove('flex');
-                viewDatabase.classList.remove('hidden'); viewDatabase.classList.add('flex');
+                viewInput.classList.add('hidden');
+                viewInput.classList.remove('flex');
+                viewDatabase.classList.remove('hidden');
+                viewDatabase.classList.add('flex');
+
                 tabDatabase.className = "flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2";
-                tabInput.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
+                tabInput.className = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
+                
+                // Pastikan Auth sudah aktif sebelum memanggil Firestore
+                if(auth.currentUser && allVoters.length === 0) fetchVoters(); 
             }
         }
         tabInput.addEventListener('click', () => switchTab('input'));
         tabDatabase.addEventListener('click', () => switchTab('database'));
 
-        // Template CSV
+
+        // =====================================================================
+        // LOGIKA DOWNLOAD TEMPLATE & UPLOAD MASSAL
+        // =====================================================================
         document.getElementById('btn-download-template').addEventListener('click', () => {
             const csvContent = "nisn,nama,role\n1234567890,BUDI SANTOSO,Siswa\n198001012005011001,PAK GURU S.PD,Guru\n9876543210,SITI AMINAH,Siswa\nREKAP2026,PANITIA UTAMA,Panitia";
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.download = "template_data_pemilih.csv";
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
 
-        // --- UPLOAD MASSAL ---
         const btnUpload = document.getElementById('btn-upload');
         const fileInput = document.getElementById('csv-file');
-        
+        const statusArea = document.getElementById('status-area');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const logMessage = document.getElementById('log-message');
+
         btnUpload.addEventListener('click', async () => {
             const file = fileInput.files[0];
-            if (!file) return showAlert("File Kosong", "Silakan pilih file CSV terlebih dahulu!");
+            if (!file) return alert("Silakan pilih file CSV terlebih dahulu!");
 
             btnUpload.disabled = true;
-            document.getElementById('status-area').classList.remove('hidden');
-            const logMsg = document.getElementById('log-message');
-            logMsg.textContent = "Membaca file..."; logMsg.className = "text-xs text-center text-blue-500 mt-3";
+            fileInput.disabled = true;
+            statusArea.classList.remove('hidden');
+            logMessage.textContent = "Membaca file CSV...";
+            logMessage.className = "text-xs text-center text-blue-500 mt-3";
 
             Papa.parse(file, {
-                header: true, skipEmptyLines: true,
+                header: true,
+                skipEmptyLines: true,
                 complete: async function(results) {
                     const data = results.data;
                     const total = data.length;
                     
                     if (total === 0) {
-                        showAlert("Error", "File CSV kosong.");
-                        btnUpload.disabled = false; return;
+                        alert("File CSV kosong.");
+                        resetBulkUI(); return;
                     }
 
                     let successCount = 0;
-                    logMsg.textContent = "Menyimpan ke server... JANGAN TUTUP HALAMAN INI!";
+                    logMessage.textContent = "Sedang memproses... JANGAN TUTUP HALAMAN!";
 
                     for (let i = 0; i < total; i++) {
                         const row = data[i];
@@ -397,102 +415,153 @@
 
                         if (nisn && nama) {
                             try {
-                                const docRef = doc(db, COLLECTION_NAME, nisn);
-                                await setDoc(docRef, { name: nama, role: role, updatedAt: new Date().toISOString() });
+                                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
+                                await setDoc(docRef, { name: nama, role: role }, { merge: true });
                                 successCount++;
-                            } catch (err) { console.error(`Gagal NISN ${nisn}:`, err); }
+                            } catch (err) {
+                                console.error(`Gagal NISN ${nisn}:`, err);
+                            }
                         }
-                        
-                        document.getElementById('progress-bar').style.width = `${Math.round(((i + 1) / total) * 100)}%`;
-                        document.getElementById('progress-text').textContent = `${i + 1} / ${total}`;
+
+                        const percent = Math.round(((i + 1) / total) * 100);
+                        progressBar.style.width = `${percent}%`;
+                        progressText.textContent = `${i + 1} / ${total}`;
                     }
 
-                    showAlert("Selesai", `Upload Massal Selesai!\nBerhasil menyimpan ${successCount} dari ${total} data.`);
-                    btnUpload.disabled = false; fileInput.value = '';
-                    setTimeout(() => { document.getElementById('status-area').classList.add('hidden'); }, 3000);
-                    allVoters = []; // Reset cache agar ambil terbaru
+                    logMessage.textContent = "Selesai!";
+                    logMessage.className = "text-xs text-center font-bold text-green-600 mt-3";
+                    alert(`Upload Massal Selesai!\nBerhasil: ${successCount} dari ${total} baris.`);
+                    resetBulkUI(true);
+                    
+                    allVoters = []; // Reset cache agar mengambil ulang jika ke tab Database
+                },
+                error: function(err) {
+                    alert("Gagal membaca file: " + err.message);
+                    resetBulkUI();
                 }
             });
         });
 
-        // --- TAMBAH MANUAL ---
-        let allVoters = [];
+        function resetBulkUI(success = false) {
+            btnUpload.disabled = false;
+            fileInput.disabled = false;
+            if (!success) statusArea.classList.add('hidden');
+            fileInput.value = '';
+        }
+
+        // =====================================================================
+        // LOGIKA TAMBAH/EDIT MANUAL
+        // =====================================================================
         const formManual = document.getElementById('form-manual');
-        
+        const manualId = document.getElementById('manual-id');
+        const manualName = document.getElementById('manual-name');
+        const manualRole = document.getElementById('manual-role');
+        const btnManualSubmit = document.getElementById('btn-manual-submit');
+        const btnCancelEdit = document.getElementById('btn-cancel-edit');
+        const manualAlert = document.getElementById('manual-alert');
+
         formManual.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nisn = document.getElementById('manual-id').value.trim();
-            const nama = document.getElementById('manual-name').value.trim().toUpperCase();
-            const role = document.getElementById('manual-role').value;
-            const btnSubmit = document.getElementById('btn-manual-submit');
+            const nisn = manualId.value.trim();
+            const nama = manualName.value.trim().toUpperCase();
+            const role = manualRole.value;
 
-            btnSubmit.disabled = true;
+            btnManualSubmit.disabled = true;
+            btnManualSubmit.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>`;
+
             try {
-                const docRef = doc(db, COLLECTION_NAME, nisn);
-                await setDoc(docRef, { name: nama, role: role, updatedAt: new Date().toISOString() });
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
+                await setDoc(docRef, { name: nama, role: role }, { merge: true });
+
+                manualAlert.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+                manualAlert.classList.add('bg-green-100', 'text-green-700');
+                manualAlert.innerHTML = `<i class="ph-fill ph-check-circle mr-1"></i> Data <strong>${nama}</strong> (${nisn}) berhasil disimpan!`;
                 
-                showAlert("Sukses", `Data ${nama} (${nisn}) berhasil disimpan!`);
-                formManual.reset();
-                document.getElementById('manual-id').readOnly = false;
-                document.getElementById('btn-cancel-edit').classList.add('hidden');
-                document.getElementById('text-manual-submit').textContent = 'Simpan';
-                
-                // Tambah/Update UI Table jika sudah diload
-                const existingIndex = allVoters.findIndex(v => v.id === nisn);
-                if(existingIndex >= 0) allVoters[existingIndex] = { id: nisn, name: nama, role: role };
-                else allVoters.push({ id: nisn, name: nama, role: role });
-                renderTable();
+                resetManualForm();
+                allVoters = []; // Paksa fetch ulang jika pindah tab
+
             } catch (error) {
-                showAlert("Gagal", "Terjadi kesalahan saat menyimpan data ke database.");
+                console.error(error);
+                manualAlert.classList.remove('hidden', 'bg-green-100', 'text-green-700');
+                manualAlert.classList.add('bg-red-100', 'text-red-700');
+                manualAlert.innerHTML = `<i class="ph-fill ph-x-circle mr-1"></i> Gagal menyimpan data.`;
             } finally {
-                btnSubmit.disabled = false;
+                btnManualSubmit.disabled = false;
+                btnManualSubmit.innerHTML = `<i class="ph-bold ph-floppy-disk text-lg"></i> <span id="text-manual-submit">Simpan Data</span>`;
+                setTimeout(() => { manualAlert.classList.add('hidden'); }, 4000);
             }
         });
 
-        // --- DATABASE & TABEL ---
+        function resetManualForm() {
+            formManual.reset();
+            manualId.readOnly = false;
+            manualId.classList.remove('bg-slate-100', 'text-slate-500');
+            btnCancelEdit.classList.add('hidden');
+            document.getElementById('text-manual-submit').textContent = 'Simpan Data';
+        }
+        btnCancelEdit.addEventListener('click', resetManualForm);
+
+        // =====================================================================
+        // LOGIKA DATABASE & TABEL (Termasuk Export CSV)
+        // =====================================================================
         const tableBody = document.getElementById('table-body');
-        
-        // Keamanan XSS
-        function escapeHTML(str) { return str ? str.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : ''; }
+        const filterNisn = document.getElementById('filter-nisn');
+        const filterName = document.getElementById('filter-name');
 
         async function fetchVoters() {
-            tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500">Memuat data dari Firestore...</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Memuat data dari server...</td></tr>`;
+            
             try {
-                const snapshot = await getDocs(collection(db, COLLECTION_NAME));
+                // JALUR DATABASE ASLI SESUAI KODE LAMA ANDA
+                const votersCol = collection(db, 'artifacts', appId, 'public', 'data', 'voters_list');
+                const snapshot = await getDocs(votersCol);
+                
                 allVoters = [];
-                snapshot.forEach((doc) => { allVoters.push({ id: doc.id, ...doc.data() }); });
+                snapshot.forEach((doc) => {
+                    allVoters.push({ id: doc.id, ...doc.data() });
+                });
+                
                 renderTable();
             } catch(e) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-500 font-bold">Gagal memuat. Pastikan Anda punya izin (Security Rules).</td></tr>`;
+                console.error("Gagal mengambil data:", e);
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-500 font-bold">Gagal memuat data. Periksa koneksi internet / Hak Akses.</td></tr>`;
             }
         }
 
         function renderTable() {
-            const valNisn = document.getElementById('filter-nisn').value.toLowerCase().trim();
-            const valName = document.getElementById('filter-name').value.toLowerCase().trim();
+            const valNisn = filterNisn.value.toLowerCase().trim();
+            const valName = filterName.value.toLowerCase().trim();
 
-            let filtered = allVoters.filter(v => v.id.toLowerCase().includes(valNisn) && (v.name||'').toLowerCase().includes(valName));
+            let filtered = allVoters.filter(v => {
+                const matchNisn = v.id.toLowerCase().includes(valNisn);
+                const matchName = v.name.toLowerCase().includes(valName);
+                return matchNisn && matchName;
+            });
+
             document.getElementById('total-voters-text').textContent = allVoters.length;
-            
-            const displayData = filtered.slice(0, 150); // Maks 150 baris untuk performa
-            if(displayData.length === 0) return tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500 italic">Tidak ada data.</td></tr>`;
+            const displayData = filtered.slice(0, 100);
+
+            if(displayData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500 italic">Tidak ada data.</td></tr>`;
+                return;
+            }
 
             tableBody.innerHTML = displayData.map((v, index) => `
-                <tr class="hover:bg-slate-50 transition-colors group border-b border-slate-100">
+                <tr class="hover:bg-slate-50 transition-colors group">
                     <td class="px-6 py-4 text-slate-500">${index + 1}</td>
-                    <td class="px-6 py-4 font-bold text-slate-800">${escapeHTML(v.id)}</td>
-                    <td class="px-6 py-4 text-slate-700">${escapeHTML(v.name)}</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${v.id}</td>
+                    <td class="px-6 py-4 text-slate-700">${v.name}</td>
                     <td class="px-6 py-4">
                         <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${v.role === 'Panitia' ? 'bg-purple-100 text-purple-700' : (v.role === 'Guru' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700')}">
-                            ${escapeHTML(v.role || 'Siswa')}
+                            ${v.role || 'Siswa'}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <div class="flex items-center justify-center gap-2 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button class="btn-edit p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-md" data-id="${escapeHTML(v.id)}" data-name="${escapeHTML(v.name)}" data-role="${escapeHTML(v.role)}">
+                        <div class="flex items-center justify-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button class="btn-edit p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-md transition-colors" data-id="${v.id}" data-name="${v.name}" data-role="${v.role}" title="Edit">
                                 <i class="ph-bold ph-pencil-simple text-base"></i>
                             </button>
-                            <button class="btn-delete p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md" data-id="${escapeHTML(v.id)}" data-name="${escapeHTML(v.name)}">
+                            <button class="btn-delete p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md transition-colors" data-id="${v.id}" data-name="${v.name}" title="Hapus">
                                 <i class="ph-bold ph-trash text-base"></i>
                             </button>
                         </div>
@@ -501,62 +570,62 @@
             `).join('');
         }
 
-        document.getElementById('filter-nisn').addEventListener('input', renderTable);
-        document.getElementById('filter-name').addEventListener('input', renderTable);
+        // Listener Filter & Refresh
+        filterNisn.addEventListener('input', renderTable);
+        filterName.addEventListener('input', renderTable);
         document.getElementById('btn-refresh-data').addEventListener('click', fetchVoters);
 
-        // Edit / Delete Listeners
-        tableBody.addEventListener('click', (e) => {
+        // FITUR EXPORT CSV
+        document.getElementById('btn-export-csv').addEventListener('click', () => {
+            if (allVoters.length === 0) return alert("Belum ada data untuk diunduh!");
+            
+            const csvRows = ["nisn,nama,role"]; // Header
+            allVoters.forEach(v => {
+                csvRows.push(`${v.id},"${v.name}",${v.role}`);
+            });
+            
+            const blob = new Blob([csvRows.join("\n")], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Database_Pemilih_EVoting.csv";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+        // Event Delegation Tabel (Edit/Hapus)
+        tableBody.addEventListener('click', async (e) => {
             const btnEdit = e.target.closest('.btn-edit');
             const btnDelete = e.target.closest('.btn-delete');
 
             if(btnEdit) {
+                const { id, name, role } = btnEdit.dataset;
                 switchTab('input');
-                document.getElementById('manual-id').value = btnEdit.dataset.id;
-                document.getElementById('manual-id').readOnly = true;
-                document.getElementById('manual-name').value = btnEdit.dataset.name;
-                document.getElementById('manual-role').value = btnEdit.dataset.role;
-                document.getElementById('btn-cancel-edit').classList.remove('hidden');
-                document.getElementById('text-manual-submit').textContent = 'Update';
+                manualId.value = id;
+                manualId.readOnly = true; 
+                manualId.classList.add('bg-slate-100', 'text-slate-500');
+                manualName.value = name;
+                manualRole.value = role;
+                document.getElementById('text-manual-submit').textContent = 'Update Data';
+                btnCancelEdit.classList.remove('hidden');
                 viewInput.scrollIntoView({ behavior: 'smooth' });
             }
 
             if(btnDelete) {
                 const { id, name } = btnDelete.dataset;
-                showConfirm("Hapus Data", `Hapus pemilih:\nNama: ${name}\nNISN: ${id}\n\nTindakan ini permanen.`, async () => {
+                if(confirm(`Yakin HAPUS data:\n\nNama: ${name}\nNISN: ${id}`)) {
                     try {
-                        await deleteDoc(doc(db, COLLECTION_NAME, id));
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', id);
+                        await deleteDoc(docRef);
                         allVoters = allVoters.filter(v => v.id !== id);
-                        renderTable();
-                        showAlert("Sukses", `Data ${name} berhasil dihapus.`);
-                    } catch(err) { showAlert("Error", "Gagal menghapus data."); }
-                });
+                        renderTable(); 
+                        alert(`Data ${name} terhapus.`);
+                    } catch(err) {
+                        alert("Gagal menghapus data.");
+                    }
+                }
             }
-        });
-
-        document.getElementById('btn-cancel-edit').addEventListener('click', () => {
-            formManual.reset();
-            document.getElementById('manual-id').readOnly = false;
-            document.getElementById('btn-cancel-edit').classList.add('hidden');
-            document.getElementById('text-manual-submit').textContent = 'Simpan';
-        });
-
-        // Ekspor Data
-        document.getElementById('btn-export-data').addEventListener('click', () => {
-            if (allVoters.length === 0) return showAlert("Gagal", "Tidak ada data untuk diekspor.");
-            
-            let csvContent = "NISN,Nama Lengkap,Role\n";
-            allVoters.forEach(v => {
-                let nama = v.name ? v.name.replace(/"/g, '""') : "";
-                if(nama.includes(',')) nama = `"${nama}"`;
-                csvContent += `${v.id},${nama},${v.role || 'Siswa'}\n`;
-            });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const dateStr = new Date().toISOString().slice(0,10).replace(/-/g,"");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Data_Pemilih_OSIS_${dateStr}.csv`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         });
     </script>
 </body>
