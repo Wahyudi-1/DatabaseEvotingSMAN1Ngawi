@@ -14,7 +14,6 @@
         /* CSS KHUSUS TAMPILAN KERTAS A4 & CETAK      */
         /* ========================================== */
         
-        /* Area Pratinjau (Preview di Layar) */
         .a4-page {
             width: 21cm;
             min-height: 29.7cm;
@@ -23,12 +22,11 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             padding: 1cm;
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 Kolom */
-            grid-template-rows: repeat(4, 1fr);    /* 4 Baris = 16 Kartu */
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
             gap: 10px;
         }
         
-        /* Desain Kartu Pemilih */
         .card-print {
             border: 1.5px solid #64748b;
             border-radius: 8px;
@@ -41,14 +39,14 @@
             overflow: hidden;
             page-break-inside: avoid;
         }
-        .school-header-print { font-size: 10px; font-weight: bold; color: #1e293b; border-bottom: 1.5px dashed #cbd5e1; padding-bottom: 6px; margin-bottom: 6px; }
-        .qr-container-print { display: flex; justify-content: center; margin: 4px 0; }
+        .school-header-print { font-size: 10px; font-weight: bold; color: #1e293b; border-bottom: 1.5px dashed #cbd5e1; padding-bottom: 6px; margin-bottom: 6px; line-height: 1.2; }
+        .qr-container-print { display: flex; justify-content: center; margin: 3px 0; }
         .qr-box-print { padding: 4px; border: 1px solid #e2e8f0; border-radius: 4px; display: inline-block; background: white; }
         .voter-name-print { font-size: 11px; font-weight: 900; color: #0f172a; text-transform: uppercase; margin-top: 4px; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .voter-nisn-print { font-size: 10px; color: #475569; margin-top: 2px; font-weight: bold; }
+        .voter-kelas-print { font-size: 10px; color: #334155; margin-top: 2px; font-weight: 700; }
         .voter-role-print { font-size: 9px; font-weight: bold; margin-top: 4px; display: inline-block; padding: 2px 6px; border: 1px solid #334155; border-radius: 10px; text-transform: uppercase; }
 
-        /* Aturan Khusus Saat Printer Bekerja (Ctrl+P) */
         @media print {
             body { background: white !important; padding: 0 !important; margin: 0 !important; }
             .no-print { display: none !important; }
@@ -63,9 +61,9 @@
                 min-height: auto;
                 margin: 0;
                 box-shadow: none;
-                padding: 0; /* Biarkan printer yang mengatur margin tepi kertas */
-                page-break-after: always; /* Memaksa printer ganti halaman untuk tiap A4 */
-                gap: 5px; /* Kurangi gap sedikit saat dicetak */
+                padding: 0;
+                page-break-after: always;
+                gap: 5px;
             }
             .card-print { padding: 8px; }
         }
@@ -73,9 +71,7 @@
 </head>
 <body class="bg-slate-100 min-h-screen relative font-sans">
 
-    <!-- ========================================== -->
     <!-- VIEW: HALAMAN LOGIN -->
-    <!-- ========================================== -->
     <div id="login-view" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-100 min-h-screen p-4 no-print">
         <div class="w-full max-w-md text-center mb-6">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4 shadow-sm border border-blue-200">
@@ -100,29 +96,22 @@
                     Gagal login! Periksa kembali email dan password.
                 </div>
 
-                <button type="submit" id="btn-login-submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all gap-2 items-center">
+                <button type="submit" id="btn-login-submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all gap-2 items-center">
                     <i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem
                 </button>
             </form>
         </div>
-        <p class="text-xs text-slate-400 mt-6 text-center max-w-sm">
-            Gunakan akun yang telah didaftarkan melalui Firebase Authentication.
-        </p>
+        <p class="text-xs text-slate-400 mt-6 text-center max-w-sm">Gunakan akun yang telah didaftarkan melalui Firebase Authentication.</p>
     </div>
 
-    <!-- ========================================== -->
     <!-- VIEW: APLIKASI UTAMA (DASHBOARD) -->
-    <!-- ========================================== -->
     <div id="app-view" class="hidden flex-col items-center w-full p-4 md:p-6 min-h-screen">
         
-        <!-- Header Top -->
         <div class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 no-print">
             <div>
                 <h1 class="text-2xl font-extrabold text-slate-800">Panel Admin Pemilih</h1>
                 <p class="text-slate-500 text-sm">Sistem E-Voting OSIS SMAN 1 Ngawi</p>
             </div>
-            
-            <!-- Info User & Tombol Keluar -->
             <div class="flex items-center gap-4 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 w-full md:w-auto justify-between md:justify-end">
                 <div class="text-right hidden sm:block">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Login sebagai</p>
@@ -134,10 +123,8 @@
             </div>
         </div>
 
-        <!-- Main Card -->
         <div class="main-card bg-white rounded-2xl shadow-xl w-full max-w-5xl border border-slate-200 overflow-hidden flex flex-col relative">
             
-            <!-- Tab Navigasi (Tiga Menu Sekarang) -->
             <div class="flex border-b border-slate-200 bg-slate-50 no-print flex-col sm:flex-row">
                 <button id="tab-input" class="flex-1 py-4 font-bold text-blue-700 bg-white border-t-4 border-blue-600 transition-all flex items-center justify-center gap-2">
                     <i class="ph-bold ph-plus-circle text-lg"></i> Input Data
@@ -166,11 +153,11 @@
 
                     <div class="bg-blue-50 p-4 rounded-xl mb-6 text-xs text-blue-800 border border-blue-100">
                         <strong>Format Header CSV (Baris 1):</strong><br>
-                        <code class="font-bold bg-blue-100 px-1 py-0.5 rounded">nisn, nama, role</code>
+                        <code class="font-bold bg-blue-100 px-1 py-0.5 rounded">nisn, nama, kelas, role</code>
                         
                         <div class="mt-3 pt-3 border-t border-blue-200">
                             <button id="btn-download-template" class="flex items-center gap-1.5 text-blue-700 font-bold hover:text-blue-900 transition-colors bg-white px-3 py-1.5 rounded-lg border border-blue-200 shadow-sm hover:bg-blue-100 w-full justify-center sm:w-auto">
-                                <i class="ph-bold ph-download-simple text-base"></i> Download Contoh Template CSV
+                                <i class="ph-bold ph-download-simple text-base"></i> Download Template CSV
                             </button>
                         </div>
                     </div>
@@ -178,11 +165,9 @@
                     <input type="file" id="csv-file" accept=".csv" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all mb-6 cursor-pointer border border-slate-200 rounded-xl p-2 bg-slate-50">
 
                     <button id="btn-upload" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
-                        <i class="ph-bold ph-upload-simple text-lg"></i>
-                        Mulai Upload Massal
+                        <i class="ph-bold ph-upload-simple text-lg"></i> Mulai Upload Massal
                     </button>
 
-                    <!-- Area Status Upload Massal -->
                     <div id="status-area" class="mt-6 hidden">
                         <div class="flex justify-between text-xs font-bold text-slate-700 mb-2">
                             <span>Proses Upload:</span>
@@ -203,7 +188,7 @@
                         </div>
                         <div>
                             <h2 class="text-xl font-bold text-slate-800">Tambah / Edit Manual</h2>
-                            <p class="text-slate-500 text-xs mt-1">Gunakan untuk data susulan atau perbaikan nama.</p>
+                            <p class="text-slate-500 text-xs mt-1">Gunakan untuk data susulan atau perbaikan.</p>
                         </div>
                     </div>
 
@@ -211,12 +196,16 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">NISN / NIP (ID Pemilih)</label>
                             <input type="text" id="manual-id" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-medium" placeholder="Contoh: 1234567890">
-                            <p class="text-[10px] text-slate-400 mt-1">*Jika NISN sudah ada, sistem otomatis mengubah datanya.</p>
                         </div>
                         
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
                             <input type="text" id="manual-name" required class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none uppercase font-medium" placeholder="Masukkan nama...">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Kelas (Kosongkan jika bukan siswa)</label>
+                            <input type="text" id="manual-kelas" class="w-full p-2.5 text-sm bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none uppercase font-medium" placeholder="Contoh: X-1, XII IPA 2">
                         </div>
 
                         <div>
@@ -233,15 +222,10 @@
                                 <i class="ph-bold ph-floppy-disk text-lg"></i>
                                 <span id="text-manual-submit">Simpan Data</span>
                             </button>
-                            <button type="button" id="btn-cancel-edit" class="hidden py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all">
-                                Batal
-                            </button>
+                            <button type="button" id="btn-cancel-edit" class="hidden py-3 px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all">Batal</button>
                         </div>
                     </form>
-
-                    <div id="manual-alert" class="mt-4 hidden p-3 rounded-lg text-xs font-bold text-center transition-all">
-                        Pesan Notifikasi
-                    </div>
+                    <div id="manual-alert" class="mt-4 hidden p-3 rounded-lg text-xs font-bold text-center transition-all"></div>
                 </div>
             </div>
 
@@ -253,15 +237,10 @@
                         <p class="text-slate-500 text-xs mt-1">Total data: <span id="total-voters-text" class="font-bold text-blue-600">0</span> orang</p>
                     </div>
                     
-                    <!-- Filter Pencarian -->
                     <div class="flex flex-col sm:flex-row gap-2">
                         <div class="relative">
                             <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
-                            <input type="text" id="filter-nisn" placeholder="Cari NISN..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-40">
-                        </div>
-                        <div class="relative">
-                            <i class="ph ph-text-aa absolute left-3 top-2.5 text-slate-400"></i>
-                            <input type="text" id="filter-name" placeholder="Cari Nama..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase w-full sm:w-56">
+                            <input type="text" id="filter-nisn" placeholder="Cari NISN/Nama..." class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-56 uppercase">
                         </div>
                         <button id="btn-refresh-data" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all flex items-center justify-center gap-2" title="Refresh Tabel">
                             <i class="ph-bold ph-arrows-clockwise"></i>
@@ -272,7 +251,6 @@
                     </div>
                 </div>
 
-                <!-- Tabel Data -->
                 <div class="w-full overflow-x-auto border border-slate-200 rounded-xl">
                     <table class="w-full text-sm text-left whitespace-nowrap">
                         <thead class="text-xs text-slate-500 bg-slate-50 uppercase font-bold">
@@ -280,26 +258,23 @@
                                 <th scope="col" class="px-6 py-4">No</th>
                                 <th scope="col" class="px-6 py-4">NISN / NIP</th>
                                 <th scope="col" class="px-6 py-4">Nama Lengkap</th>
+                                <th scope="col" class="px-6 py-4">Kelas</th>
                                 <th scope="col" class="px-6 py-4">Status / Role</th>
                                 <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="table-body" class="divide-y divide-slate-100">
                             <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-slate-500">
-                                    Menunggu proses login...
-                                </td>
+                                <td colspan="6" class="px-6 py-10 text-center text-slate-500">Menunggu proses login...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <p class="text-xs text-slate-400 mt-3 text-center">*Menampilkan maksimal 100 hasil pencarian teratas agar browser tidak lambat.</p>
             </div>
 
             <!-- VIEW 3: CETAK KARTU (PREVIEW A4) -->
             <div id="view-print" class="hidden flex-col w-full bg-slate-200 min-h-[500px]">
                 
-                <!-- Bilah Kontrol Cetak (Tidak ikut terprint) -->
                 <div class="flex justify-between items-center p-4 bg-white border-b border-slate-200 sticky top-0 z-10 no-print shadow-sm">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800"><i class="ph-fill ph-printer text-purple-600 mr-1"></i> Preview Kertas A4</h2>
@@ -310,9 +285,7 @@
                     </button>
                 </div>
 
-                <!-- Container untuk menampung lembaran-lembaran A4 -->
                 <div id="print-pages-container" class="p-8 overflow-y-auto flex flex-col items-center w-full">
-                    <!-- Lembaran A4 akan di-inject ke sini via JavaScript -->
                     <div class="text-center text-slate-500 mt-10 no-print">
                         <div class="w-8 h-8 border-4 border-slate-300 border-t-purple-600 rounded-full animate-spin mx-auto mb-3"></div>
                         Menyiapkan pratinjau kartu...
@@ -343,38 +316,27 @@
         const db = getFirestore(app);
         const appId = 'osis-sman1ngawi-app'; 
 
-        let allVoters = []; // Variabel global penyimpan data sementara
+        let allVoters = [];
 
         // =====================================================================
-        // LOGIKA AUTENTIKASI (LOGIN & LOGOUT)
+        // LOGIKA AUTENTIKASI
         // =====================================================================
         const loginView = document.getElementById('login-view');
         const appView = document.getElementById('app-view');
         const adminEmailDisplay = document.getElementById('admin-email-display');
         const formLogin = document.getElementById('form-login');
         const btnLoginSubmit = document.getElementById('btn-login-submit');
-        const loginError = document.getElementById('login-error');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                loginView.classList.add('hidden');
-                appView.classList.remove('hidden');
-                appView.classList.add('flex');
-                
+                loginView.classList.add('hidden'); appView.classList.remove('hidden'); appView.classList.add('flex');
                 adminEmailDisplay.textContent = user.email;
-                
-                if(document.getElementById('view-database').classList.contains('flex')) {
-                    fetchVoters();
-                } else if(document.getElementById('view-print').classList.contains('flex')) {
-                    fetchVoters().then(generatePrintPreview);
-                }
+                if(document.getElementById('view-database').classList.contains('flex')) fetchVoters();
+                else if(document.getElementById('view-print').classList.contains('flex')) fetchVoters().then(generatePrintPreview);
             } else {
-                loginView.classList.remove('hidden');
-                appView.classList.add('hidden');
-                appView.classList.remove('flex');
-                
+                loginView.classList.remove('hidden'); appView.classList.add('hidden'); appView.classList.remove('flex');
                 allVoters = []; 
-                document.getElementById('table-body').innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500">Menunggu proses login...</td></tr>`;
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-slate-500">Menunggu proses login...</td></tr>`;
             }
         });
 
@@ -385,25 +347,20 @@
             
             btnLoginSubmit.disabled = true;
             btnLoginSubmit.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>`;
-            loginError.classList.add('hidden');
+            document.getElementById('login-error').classList.add('hidden');
             
             signInWithEmailAndPassword(auth, email, pass)
                 .then(() => {
-                    btnLoginSubmit.disabled = false;
-                    btnLoginSubmit.innerHTML = `<i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem`;
+                    btnLoginSubmit.disabled = false; btnLoginSubmit.innerHTML = `<i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem`;
                     formLogin.reset();
-                })
-                .catch((error) => {
-                    btnLoginSubmit.disabled = false;
-                    btnLoginSubmit.innerHTML = `<i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem`;
-                    loginError.classList.remove('hidden');
+                }).catch(() => {
+                    btnLoginSubmit.disabled = false; btnLoginSubmit.innerHTML = `<i class="ph-bold ph-sign-in text-lg"></i> Masuk Sistem`;
+                    document.getElementById('login-error').classList.remove('hidden');
                 });
         });
 
         document.getElementById('btn-logout').addEventListener('click', () => {
-            if (confirm("Apakah Anda yakin ingin keluar dari Panel Admin?")) {
-                signOut(auth).catch(err => alert("Gagal keluar: " + err.message));
-            }
+            if (confirm("Apakah Anda yakin ingin keluar?")) signOut(auth).catch(err => alert("Gagal keluar: " + err.message));
         });
 
         // =====================================================================
@@ -412,7 +369,6 @@
         const tabInput = document.getElementById('tab-input');
         const tabDatabase = document.getElementById('tab-database');
         const tabPrint = document.getElementById('tab-print');
-        
         const viewInput = document.getElementById('view-input');
         const viewDatabase = document.getElementById('view-database');
         const viewPrint = document.getElementById('view-print');
@@ -421,34 +377,20 @@
         const inactiveTabClass = "flex-1 py-4 font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 border-t-4 border-transparent transition-all flex items-center justify-center gap-2";
 
         function switchTab(tabName) {
-            // Sembunyikan Semua View
             viewInput.classList.add('hidden'); viewInput.classList.remove('flex');
             viewDatabase.classList.add('hidden'); viewDatabase.classList.remove('flex');
             viewPrint.classList.add('hidden'); viewPrint.classList.remove('flex');
 
-            // Reset Tab Class
-            tabInput.className = inactiveTabClass;
-            tabDatabase.className = inactiveTabClass;
-            tabPrint.className = inactiveTabClass;
+            tabInput.className = inactiveTabClass; tabDatabase.className = inactiveTabClass; tabPrint.className = inactiveTabClass;
 
-            // Aktifkan yang dipilih
             if(tabName === 'input') {
-                viewInput.classList.remove('hidden'); viewInput.classList.add('flex');
-                tabInput.className = activeTabClass;
+                viewInput.classList.remove('hidden'); viewInput.classList.add('flex'); tabInput.className = activeTabClass;
             } else if (tabName === 'database') {
-                viewDatabase.classList.remove('hidden'); viewDatabase.classList.add('flex');
-                tabDatabase.className = activeTabClass;
+                viewDatabase.classList.remove('hidden'); viewDatabase.classList.add('flex'); tabDatabase.className = activeTabClass;
                 if(auth.currentUser && allVoters.length === 0) fetchVoters(); 
             } else if (tabName === 'print') {
-                viewPrint.classList.remove('hidden'); viewPrint.classList.add('flex');
-                tabPrint.className = activeTabClass;
-                
-                // Pastikan data ada sebelum men-generate preview
-                if(auth.currentUser && allVoters.length === 0) {
-                    fetchVoters().then(generatePrintPreview);
-                } else {
-                    generatePrintPreview();
-                }
+                viewPrint.classList.remove('hidden'); viewPrint.classList.add('flex'); tabPrint.className = activeTabClass;
+                if(auth.currentUser && allVoters.length === 0) fetchVoters().then(generatePrintPreview); else generatePrintPreview();
             }
         }
         tabInput.addEventListener('click', () => switchTab('input'));
@@ -456,79 +398,61 @@
         tabPrint.addEventListener('click', () => switchTab('print'));
 
         // =====================================================================
-        // LOGIKA DOWNLOAD TEMPLATE & UPLOAD MASSAL
+        // LOGIKA DOWNLOAD TEMPLATE & UPLOAD MASSAL (DENGAN KELAS)
         // =====================================================================
         document.getElementById('btn-download-template').addEventListener('click', () => {
-            const csvContent = "nisn,nama,role\n1234567890,BUDI SANTOSO,Siswa\n198001012005011001,PAK GURU S.PD,Guru\n9876543210,SITI AMINAH,Siswa\nREKAP2026,PANITIA UTAMA,Panitia";
+            const csvContent = "nisn,nama,kelas,role\n1234567890,BUDI SANTOSO,X-1,Siswa\n198001012005011001,PAK GURU S.PD,-,Guru\n9876543210,SITI AMINAH,XI-IPA-1,Siswa\nREKAP2026,PANITIA UTAMA,-,Panitia";
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "template_data_pemilih.csv";
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "template_data_pemilih.csv";
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         });
 
         const btnUpload = document.getElementById('btn-upload');
         const fileInput = document.getElementById('csv-file');
-        const statusArea = document.getElementById('status-area');
-        const progressBar = document.getElementById('progress-bar');
-        const progressText = document.getElementById('progress-text');
-        const logMessage = document.getElementById('log-message');
 
         btnUpload.addEventListener('click', async () => {
             const file = fileInput.files[0];
             if (!file) return alert("Silakan pilih file CSV terlebih dahulu!");
 
             btnUpload.disabled = true; fileInput.disabled = true;
-            statusArea.classList.remove('hidden');
+            document.getElementById('status-area').classList.remove('hidden');
+            const logMessage = document.getElementById('log-message');
             logMessage.textContent = "Membaca file CSV...";
-            logMessage.className = "text-xs text-center text-blue-500 mt-3";
 
             Papa.parse(file, {
                 header: true, skipEmptyLines: true,
                 complete: async function(results) {
-                    const data = results.data;
-                    const total = data.length;
-                    
-                    if (total === 0) { alert("File CSV kosong."); resetBulkUI(); return; }
+                    const data = results.data; const total = data.length;
+                    if (total === 0) { alert("File CSV kosong."); btnUpload.disabled = false; fileInput.disabled = false; return; }
 
                     let successCount = 0;
-                    logMessage.textContent = "Sedang memproses... JANGAN TUTUP HALAMAN!";
+                    logMessage.textContent = "Menyimpan ke database... JANGAN TUTUP HALAMAN!";
 
                     for (let i = 0; i < total; i++) {
                         const row = data[i];
                         const nisn = row.nisn ? row.nisn.toString().trim() : "";
                         const nama = row.nama ? row.nama.toString().trim().toUpperCase() : "";
+                        const kelas = row.kelas ? row.kelas.toString().trim().toUpperCase() : "-";
                         const role = row.role ? row.role.toString().trim() : "Siswa";
 
                         if (nisn && nama) {
                             try {
                                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
-                                await setDoc(docRef, { name: nama, role: role }, { merge: true });
+                                await setDoc(docRef, { name: nama, kelas: kelas, role: role }, { merge: true });
                                 successCount++;
-                            } catch (err) { console.error(`Gagal NISN ${nisn}:`, err); }
+                            } catch (err) { console.error(`Gagal NISN ${nisn}`); }
                         }
-                        progressBar.style.width = `${Math.round(((i + 1) / total) * 100)}%`;
-                        progressText.textContent = `${i + 1} / ${total}`;
+                        document.getElementById('progress-bar').style.width = `${Math.round(((i + 1) / total) * 100)}%`;
+                        document.getElementById('progress-text').textContent = `${i + 1} / ${total}`;
                     }
 
                     logMessage.textContent = "Selesai!";
-                    logMessage.className = "text-xs text-center font-bold text-green-600 mt-3";
                     alert(`Upload Massal Selesai!\nBerhasil: ${successCount} dari ${total} baris.`);
-                    resetBulkUI(true);
+                    btnUpload.disabled = false; fileInput.disabled = false; fileInput.value = '';
                     allVoters = []; // Reset agar memuat data terbaru jika pindah tab
-                },
-                error: function(err) { alert("Gagal membaca file: " + err.message); resetBulkUI(); }
+                }
             });
         });
-
-        function resetBulkUI(success = false) {
-            btnUpload.disabled = false; fileInput.disabled = false;
-            if (!success) statusArea.classList.add('hidden');
-            fileInput.value = '';
-        }
 
         // =====================================================================
         // LOGIKA TAMBAH/EDIT MANUAL
@@ -536,15 +460,16 @@
         const formManual = document.getElementById('form-manual');
         const manualId = document.getElementById('manual-id');
         const manualName = document.getElementById('manual-name');
+        const manualKelas = document.getElementById('manual-kelas');
         const manualRole = document.getElementById('manual-role');
         const btnManualSubmit = document.getElementById('btn-manual-submit');
         const btnCancelEdit = document.getElementById('btn-cancel-edit');
-        const manualAlert = document.getElementById('manual-alert');
 
         formManual.addEventListener('submit', async (e) => {
             e.preventDefault();
             const nisn = manualId.value.trim();
             const nama = manualName.value.trim().toUpperCase();
+            const kelas = manualKelas.value.trim().toUpperCase() || "-"; // Default "-" jika dikosongi
             const role = manualRole.value;
 
             btnManualSubmit.disabled = true;
@@ -552,28 +477,27 @@
 
             try {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', nisn);
-                await setDoc(docRef, { name: nama, role: role }, { merge: true });
+                await setDoc(docRef, { name: nama, kelas: kelas, role: role }, { merge: true });
 
-                manualAlert.className = 'mt-4 p-3 rounded-lg text-xs font-bold text-center transition-all bg-green-100 text-green-700';
-                manualAlert.innerHTML = `<i class="ph-fill ph-check-circle mr-1"></i> Data <strong>${nama}</strong> (${nisn}) berhasil disimpan!`;
+                const alertBox = document.getElementById('manual-alert');
+                alertBox.className = 'mt-4 p-3 rounded-lg text-xs font-bold text-center transition-all bg-green-100 text-green-700';
+                alertBox.innerHTML = `<i class="ph-fill ph-check-circle mr-1"></i> Data disimpan!`;
+                alertBox.classList.remove('hidden');
                 
                 resetManualForm();
                 allVoters = []; 
-
+                setTimeout(() => { alertBox.classList.add('hidden'); }, 3000);
             } catch (error) {
-                manualAlert.className = 'mt-4 p-3 rounded-lg text-xs font-bold text-center transition-all bg-red-100 text-red-700';
-                manualAlert.innerHTML = `<i class="ph-fill ph-x-circle mr-1"></i> Gagal menyimpan data.`;
+                alert("Gagal menyimpan data.");
             } finally {
                 btnManualSubmit.disabled = false;
                 btnManualSubmit.innerHTML = `<i class="ph-bold ph-floppy-disk text-lg"></i> <span id="text-manual-submit">Simpan Data</span>`;
-                setTimeout(() => { manualAlert.classList.add('hidden'); }, 4000);
             }
         });
 
         function resetManualForm() {
             formManual.reset();
-            manualId.readOnly = false;
-            manualId.classList.remove('bg-slate-100', 'text-slate-500');
+            manualId.readOnly = false; manualId.classList.remove('bg-slate-100', 'text-slate-500');
             btnCancelEdit.classList.add('hidden');
             document.getElementById('text-manual-submit').textContent = 'Simpan Data';
         }
@@ -584,45 +508,40 @@
         // =====================================================================
         const tableBody = document.getElementById('table-body');
         const filterNisn = document.getElementById('filter-nisn');
-        const filterName = document.getElementById('filter-name');
 
-        // fetchVoters diubah menjadi fungsi yang mengembalikan Promise
         function fetchVoters() {
             return new Promise(async (resolve, reject) => {
-                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Memuat data dari server...</td></tr>`;
-                
+                tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-slate-500"><div class="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Memuat data...</td></tr>`;
                 try {
                     const votersCol = collection(db, 'artifacts', appId, 'public', 'data', 'voters_list');
                     const snapshot = await getDocs(votersCol);
-                    
                     allVoters = [];
-                    snapshot.forEach((doc) => {
-                        allVoters.push({ id: doc.id, ...doc.data() });
-                    });
+                    snapshot.forEach((doc) => { allVoters.push({ id: doc.id, ...doc.data() }); });
                     
-                    renderTable();
-                    resolve(allVoters);
+                    // Sort by Kelas (Alphabetical) then Name
+                    allVoters.sort((a, b) => {
+                        let kelasA = (a.kelas || "").toUpperCase(); let kelasB = (b.kelas || "").toUpperCase();
+                        if(kelasA < kelasB) return -1; if(kelasA > kelasB) return 1;
+                        return (a.name || "").localeCompare(b.name || "");
+                    });
+
+                    renderTable(); resolve(allVoters);
                 } catch(e) {
-                    console.error("Gagal mengambil data:", e);
-                    tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-red-500 font-bold">Gagal memuat data. Periksa koneksi internet.</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-red-500 font-bold">Gagal memuat data.</td></tr>`;
                     reject(e);
                 }
             });
         }
 
         function renderTable() {
-            const valNisn = filterNisn.value.toLowerCase().trim();
-            const valName = filterName.value.toLowerCase().trim();
-
-            let filtered = allVoters.filter(v => {
-                return v.id.toLowerCase().includes(valNisn) && v.name.toLowerCase().includes(valName);
-            });
+            const valCari = filterNisn.value.toLowerCase().trim();
+            let filtered = allVoters.filter(v => v.id.toLowerCase().includes(valCari) || v.name.toLowerCase().includes(valCari) || (v.kelas || "").toLowerCase().includes(valCari));
 
             document.getElementById('total-voters-text').textContent = allVoters.length;
             const displayData = filtered.slice(0, 100);
 
             if(displayData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-500 italic">Tidak ada data.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="6" class="px-6 py-10 text-center text-slate-500 italic">Tidak ada data.</td></tr>`;
                 return;
             }
 
@@ -631,6 +550,7 @@
                     <td class="px-6 py-4 text-slate-500">${index + 1}</td>
                     <td class="px-6 py-4 font-bold text-slate-800">${v.id}</td>
                     <td class="px-6 py-4 text-slate-700">${v.name}</td>
+                    <td class="px-6 py-4 font-bold text-slate-600">${v.kelas || '-'}</td>
                     <td class="px-6 py-4">
                         <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${v.role === 'Panitia' ? 'bg-purple-100 text-purple-700' : (v.role === 'Guru' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700')}">
                             ${v.role || 'Siswa'}
@@ -638,12 +558,8 @@
                     </td>
                     <td class="px-6 py-4 text-center">
                         <div class="flex items-center justify-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button class="btn-edit p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-md transition-colors" data-id="${v.id}" data-name="${v.name}" data-role="${v.role}" title="Edit">
-                                <i class="ph-bold ph-pencil-simple text-base"></i>
-                            </button>
-                            <button class="btn-delete p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md transition-colors" data-id="${v.id}" data-name="${v.name}" title="Hapus">
-                                <i class="ph-bold ph-trash text-base"></i>
-                            </button>
+                            <button class="btn-edit p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-md" data-id="${v.id}" data-name="${v.name}" data-kelas="${v.kelas || '-'}" data-role="${v.role}"><i class="ph-bold ph-pencil-simple text-base"></i></button>
+                            <button class="btn-delete p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md" data-id="${v.id}" data-name="${v.name}"><i class="ph-bold ph-trash text-base"></i></button>
                         </div>
                     </td>
                 </tr>
@@ -651,17 +567,14 @@
         }
 
         filterNisn.addEventListener('input', renderTable);
-        filterName.addEventListener('input', renderTable);
         document.getElementById('btn-refresh-data').addEventListener('click', fetchVoters);
 
         document.getElementById('btn-export-csv').addEventListener('click', () => {
-            if (allVoters.length === 0) return alert("Belum ada data untuk diunduh!");
-            const csvRows = ["nisn,nama,role"];
-            allVoters.forEach(v => { csvRows.push(`${v.id},"${v.name}",${v.role}`); });
+            if (allVoters.length === 0) return alert("Belum ada data!");
+            const csvRows = ["nisn,nama,kelas,role"];
+            allVoters.forEach(v => { csvRows.push(`${v.id},"${v.name}","${v.kelas || '-'}",${v.role}`); });
             const blob = new Blob([csvRows.join("\n")], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "Database_Pemilih_EVoting.csv";
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "Database_Pemilih.csv";
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         });
 
@@ -670,25 +583,24 @@
             const btnDelete = e.target.closest('.btn-delete');
 
             if(btnEdit) {
-                const { id, name, role } = btnEdit.dataset;
+                const { id, name, kelas, role } = btnEdit.dataset;
                 switchTab('input');
                 manualId.value = id; manualId.readOnly = true; manualId.classList.add('bg-slate-100', 'text-slate-500');
-                manualName.value = name; manualRole.value = role;
+                manualName.value = name; 
+                manualKelas.value = kelas !== '-' ? kelas : '';
+                manualRole.value = role;
                 document.getElementById('text-manual-submit').textContent = 'Update Data';
                 btnCancelEdit.classList.remove('hidden');
-                viewInput.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('view-input').scrollIntoView({ behavior: 'smooth' });
             }
 
             if(btnDelete) {
-                const { id, name } = btnDelete.dataset;
-                if(confirm(`Yakin HAPUS data:\n\nNama: ${name}\nNISN: ${id}`)) {
+                if(confirm(`Yakin HAPUS data ${btnDelete.dataset.name}?`)) {
                     try {
-                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', id);
-                        await deleteDoc(docRef);
-                        allVoters = allVoters.filter(v => v.id !== id);
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'voters_list', btnDelete.dataset.id));
+                        allVoters = allVoters.filter(v => v.id !== btnDelete.dataset.id);
                         renderTable(); 
-                        alert(`Data ${name} terhapus.`);
-                    } catch(err) { alert("Gagal menghapus data."); }
+                    } catch(err) { alert("Gagal menghapus."); }
                 }
             }
         });
@@ -699,12 +611,11 @@
         const pagesContainer = document.getElementById('print-pages-container');
 
         function generatePrintPreview() {
-            pagesContainer.innerHTML = ""; // Bersihkan kontainer
+            pagesContainer.innerHTML = ""; 
             
             if(allVoters.length === 0) {
                 pagesContainer.innerHTML = `<div class="text-slate-400 italic py-10 no-print">Tidak ada data pemilih untuk dicetak.</div>`;
-                document.getElementById('print-total-voters').textContent = 0;
-                document.getElementById('print-total-pages').textContent = 0;
+                document.getElementById('print-total-voters').textContent = 0; document.getElementById('print-total-pages').textContent = 0;
                 return;
             }
 
@@ -714,13 +625,10 @@
             document.getElementById('print-total-voters').textContent = allVoters.length;
             document.getElementById('print-total-pages').textContent = pageCount;
 
-            // Proses per halaman (Lembar A4)
             for (let i = 0; i < pageCount; i++) {
-                // Buat Elemen Kertas A4
                 const pageElement = document.createElement('div');
                 pageElement.className = "a4-page";
                 
-                // Masukkan 16 Kartu ke dalam kertas A4
                 for (let j = 0; j < cardsPerPage; j++) {
                     const voterIndex = (i * cardsPerPage) + j;
                     
@@ -728,7 +636,6 @@
                         const v = allVoters[voterIndex];
                         const qrDivId = `qr-preview-${voterIndex}`;
                         
-                        // Buat Elemen Kartu
                         const cardHTML = `
                             <div class="card-print">
                                 <div class="school-header-print">KARTU PEMILIH E-VOTING<br>SMAN 1 NGAWI</div>
@@ -737,27 +644,23 @@
                                 </div>
                                 <div class="voter-name-print">${v.name}</div>
                                 <div class="voter-nisn-print">${v.id}</div>
+                                <div class="voter-kelas-print">${v.kelas && v.kelas !== '-' ? 'Kelas: ' + v.kelas : ''}</div>
                                 <div class="voter-role-print">${v.role}</div>
                             </div>
                         `;
                         pageElement.innerHTML += cardHTML;
                     } else {
-                        // Kotak kosong agar grid tetap sejajar meskipun di baris terakhir kurang dari 4
                         pageElement.innerHTML += `<div style="visibility: hidden;"></div>`;
                     }
                 }
-                
-                // Masukkan Kertas A4 ke dalam Pratinjau
                 pagesContainer.appendChild(pageElement);
             }
 
-            // Setelah seluruh elemen HTML di-render ke layar, baru eksekusi QR Code-nya
-            // (QRCodeJS butuh elemen ID untuk target gambarnya)
             allVoters.forEach((v, index) => {
                 new QRCode(document.getElementById(`qr-preview-${index}`), {
-                    text: v.id, // NISN sebagai text barcode
-                    width: 70,  // Ukuran pas untuk Grid 4x4
-                    height: 70,
+                    text: v.id,
+                    width: 65,  
+                    height: 65,
                     colorDark : "#0f172a",
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.M
@@ -765,7 +668,6 @@
             });
         }
 
-        // Eksekusi Panggilan Printer Asli Browser
         document.getElementById('btn-execute-print').addEventListener('click', () => {
             if(allVoters.length === 0) return alert("Belum ada data untuk dicetak!");
             window.print();
